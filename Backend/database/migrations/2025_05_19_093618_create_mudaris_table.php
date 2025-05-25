@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->string('gender', 10);
-            $table->string('adrress', 100);
-            $table->string('no_hp', 25);
+            $table->string('address');
+            $table->string('no_hp');
             $table->timestamps();
         });
     }

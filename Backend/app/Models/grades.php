@@ -7,4 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class grades extends Model
 {
     protected $table = 'grades';
+
+    protected $fillable = [
+        'santri_id',
+        'subject_id',
+        'grade',
+    ];
+
+    public function santri()
+    {
+        return $this->belongsTo(santri::class);
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(subjects::class);
+    }
 }
