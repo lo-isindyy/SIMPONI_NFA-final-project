@@ -10,6 +10,13 @@ class MudarisController extends Controller
     public function index(){
         $mudaris = mudaris::all();
 
+        if ($mudaris->isEmpty()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Resouces data not found!"
+            ], 200);
+        }
+
         // return view('mudaris',['mudaris' => $mudaris]);
 
         return response() ->json([

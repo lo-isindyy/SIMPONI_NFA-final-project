@@ -10,6 +10,13 @@ class ClassroomsController extends Controller
     public function index(){
         $classrooms = classrooms::all();
 
+        if ($classrooms->isEmpty()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Resouces data not found!"
+            ], 200);
+        }
+
         // return view('classrooms',['classrooms' => $classrooms]);
         return response() ->json([
             "success" => true,
