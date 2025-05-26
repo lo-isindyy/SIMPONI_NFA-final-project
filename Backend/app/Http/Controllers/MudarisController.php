@@ -60,4 +60,22 @@ class MudarisController extends Controller
             'data' => $mudaris
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $mudaris = mudaris::find($id);
+
+        if (!$mudaris) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $mudaris
+        ], 200);
+    }
 }

@@ -61,4 +61,22 @@ class DormAssignmentsController extends Controller
             'data' => $assignments
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $assignments = dorm_assignments::find($id);
+
+        if (!$assignments) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $assignments
+        ], 200);
+    }
 }

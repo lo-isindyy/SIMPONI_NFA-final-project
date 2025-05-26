@@ -52,4 +52,22 @@ class SubjectsController extends Controller
             'data' => $subjects
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $subjects = subjects::find($id);
+
+        if (!$subjects) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $subjects
+        ], 200);
+    }
 }

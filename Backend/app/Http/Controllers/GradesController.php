@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Validator;
 
 class GradesController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $grades = grades::all();
 
         if ($grades->isEmpty()) {
@@ -20,38 +21,57 @@ class GradesController extends Controller
 
         // return view('grades',['grades' => $grades]);
 
-        return response() ->json([
+        return response()->json([
             "success" => true,
             "message" => "Get All Resources",
             "data" => $grades
         ], 200);
-    
     }
     public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'santri_id' => 'required|exists:santri,id',
-        'subject_id' => 'required|exists:subjects,id',
-        'grade' => 'required|integer|min:0|max:100',
-    ]);
+    {
+        $validator = Validator::make($request->all(), [
+            'santri_id' => 'required|exists:santri,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'grade' => 'required|integer|min:0|max:100',
+        ]);
 
-    if ($validator->fails()) {
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $grades = grades::updateOrCreate(
+            [
+                'santri_id' => $request->santri_id,
+                'subject_id' => $request->subject_id
+            ],
+            ['grade' => $request->grade]
+        );
+
         return response()->json([
-            'success' => false,
-            'message' => $validator->errors()
-        ], 422);
+            'success' => true,
+            'message' => 'Grade saved successfully!',
+            'data' => $grades
+        ], 201);
     }
 
-    $grades = grades::updateOrCreate(
-        ['santri_id' => $request->santri_id, 
-        'subject_id' => $request->subject_id],
-        ['grade' => $request->grade]
-    );
+    public function show(string $id)
+    {
+        $grades = grades::find($id);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Grade saved successfully!',
-        'data' => $grades
-    ], 201);
-}
+        if (!$grades) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $grades
+        ], 200);
+    }
 }

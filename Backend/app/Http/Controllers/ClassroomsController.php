@@ -54,4 +54,22 @@ class ClassroomsController extends Controller
             'data' => $classrooms
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $classrooms = classrooms::find($id);
+
+        if (!$classrooms) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $classrooms
+        ], 200);
+    }
 }

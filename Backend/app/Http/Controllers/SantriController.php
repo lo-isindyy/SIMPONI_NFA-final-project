@@ -62,4 +62,22 @@ class SantriController extends Controller
             'data' => $santri
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $santri = santri::find($id);
+
+        if (!$santri) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $santri
+        ], 200);
+    }
 }

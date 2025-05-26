@@ -58,4 +58,22 @@ class DormsController extends Controller
             'data' => $dorms
         ], 201);
     }
+
+    public function show(string $id)
+    {
+        $dorms = dorms::find($id);
+
+        if (!$dorms) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get resources detail",
+            "data" => $dorms
+        ], 200);
+    }
 }
