@@ -84,7 +84,7 @@ class DormAssignmentsController extends Controller
     {
         $assignments = dorm_assignments::find($id);
 
-        if (!$classrooms) {
+        if (!$assignments) {
             return response()->json([
                 "success" => false,
                 "message" => "resources not found"

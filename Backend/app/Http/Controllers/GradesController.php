@@ -74,4 +74,23 @@ class GradesController extends Controller
             "data" => $grades
         ], 200);
     }
+
+    public function destroy(string $id)
+    {
+        $grades = grades::find($id);
+
+        if (!$grades) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $grades->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
+    }
 }
