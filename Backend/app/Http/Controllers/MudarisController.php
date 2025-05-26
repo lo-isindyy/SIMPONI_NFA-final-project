@@ -78,4 +78,67 @@ class MudarisController extends Controller
             "data" => $mudaris
         ], 200);
     }
+
+    public function update(string $id, Request $request)
+    {
+
+        $mudaris = mudaris::find($id);
+
+        if (!$mudaris) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'gender' => 'required|in:Laki-laki,Perempuan',
+            'address' => 'nullable|string',
+            'no_hp' => 'nullable|string|max:25',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'name' => $request->name,
+            'gender' => $request->gender,
+            'address' => $request->address,
+            'no_hp' => $request->no_hp,
+        ];
+
+        $mudaris->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $mudaris
+        ], 200);
+    }
+
+    public function destroy(string $id)
+    {
+        $mudaris = mudaris::find($id);
+
+        if (!$mudaris) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $mudaris->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
+    }
 }

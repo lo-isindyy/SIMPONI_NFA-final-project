@@ -80,4 +80,69 @@ class SantriController extends Controller
             "data" => $santri
         ], 200);
     }
+
+    public function update(string $id, Request $request)
+    {
+
+        $santri = santri::find($id);
+
+        if (!$santri) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'gender' => 'required|string',
+            'tgl_lahir' => 'required|date',
+            'address' => 'required|string',
+            'no_hp' => 'required|string|max:25',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'name' => $request->name,
+            'gender' => $request->gender,
+            'tgl_lahir' => $request->tgl_lahir,
+            'address' => $request->address,
+            'no_hp' => $request->no_hp,
+        ];
+
+        $santri->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $santri
+        ], 200);
+    }
+
+    public function destroy(string $id)
+    {
+        $santri = santri::find($id);
+
+        if (!$santri) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $santri->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
+    }
 }

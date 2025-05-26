@@ -44,7 +44,15 @@ class SubjectsController extends Controller
             ], 422);
         }
 
-        $subjects = subjects::create($request->all());
+        // 3. Simpan data ke database
+        $subjects = subjects::create([
+            'name' => $request->name,
+            'day' => $request->day,
+            'year' => $request->year,
+            'classroom_id' => $request->classroom_id,
+            'mudaris_id' => $request->mudaris_id,
+        ]);
+
 
         return response()->json([
             'success' => true,
@@ -69,5 +77,70 @@ class SubjectsController extends Controller
             "message" => "Get resources detail",
             "data" => $subjects
         ], 200);
+    }
+
+    public function update(string $id, Request $request)
+    {
+
+        $subjects = subjects::find($id);
+
+        if (!$subjects) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'day' => 'required|date_format:Y-m-d H:i:s',
+            'year' => 'required|digits:4|integer',
+            'classroom_id' => 'required|exists:classrooms,id',
+            'mudaris_id' => 'required|exists:mudaris,id',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'name' => $request->name,
+            'day' => $request->day,
+            'year' => $request->year,
+            'classroom_id' => $request->classroom_id,
+            'mudaris_id' => $request->mudaris_id,
+        ];
+
+        $subjects->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $subjects
+        ], 200);
+    }
+
+    public function destroy(string $id)
+    {
+        $subjects = subjects::find($id);
+
+        if (!$subjects) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $subjects->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
     }
 }

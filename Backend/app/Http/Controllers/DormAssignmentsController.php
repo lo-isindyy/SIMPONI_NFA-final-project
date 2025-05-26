@@ -79,4 +79,23 @@ class DormAssignmentsController extends Controller
             "data" => $assignments
         ], 200);
     }
+
+    public function destroy(string $id)
+    {
+        $assignments = dorm_assignments::find($id);
+
+        if (!$classrooms) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $assignments->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
+    }
 }

@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Validator;
 
 class ClassroomsController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $classrooms = classrooms::all();
 
         if ($classrooms->isEmpty()) {
@@ -19,7 +20,7 @@ class ClassroomsController extends Controller
         }
 
         // return view('classrooms',['classrooms' => $classrooms]);
-        return response() ->json([
+        return response()->json([
             "success" => true,
             "message" => "Get All Resources",
             "data" => $classrooms
@@ -71,5 +72,64 @@ class ClassroomsController extends Controller
             "message" => "Get resources detail",
             "data" => $classrooms
         ], 200);
+    }
+
+    public function update(string $id, Request $request)
+    {
+
+        $classrooms = classrooms::find($id);
+
+        if (!$classrooms) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'location' => 'required|string',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'name' => $request->name,
+            'location' => $request->location,
+        ];
+
+        $classrooms->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $classrooms
+        ], 200);
+    }
+
+    public function destroy(string $id)
+    {
+        $classrooms = classrooms::find($id);
+
+        if (!$classrooms) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        $classrooms->delete();
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources deleted",
+        ], 204);
     }
 }
