@@ -62,6 +62,50 @@ class DormAssignmentsController extends Controller
         ], 201);
     }
 
+    public function update(string $id, Request $request)
+    {
+
+        $assignments = dorm_assignments::find($id);
+
+        if (!$assignments) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'santri_id' => 'required|exists:santri,id',
+            'dorm_id' => 'required|exists:dorms,id',
+            'entry_date' => 'required|date',
+            'exit_date' => 'required|date|after_or_equal:entry_date',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'santri_id' => $request->santri_id,
+            'dorm_id' => $request->dorm_id,
+            'entry_date' => $request->entry_date,
+            'exit_date' => $request->exit_date,
+        ];
+
+        $assignments->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $assignments
+        ], 200);
+    }
+
     public function show(string $id)
     {
         $assignments = dorm_assignments::find($id);

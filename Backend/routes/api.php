@@ -14,10 +14,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/classrooms',[ClassroomsController::class, 'index']);
-Route::get('/dorms',[DormsController::class, 'index']);
-Route::get('/dorm_asigments',[DormAssignmentsController::class, 'index']);
-Route::get('/grades',[GradesController::class, 'index']);
-Route::get('/mudaris',[MudarisController::class, 'index']);
-Route::get('/santri',[SantriController::class, 'index']);
-Route::get('/subjects',[SubjectsController::class, 'index']);
+Route::apiResource('/classrooms',ClassroomsController::class);
+Route::apiResource('/dorms',DormsController::class);
+Route::apiResource('/dorm_asigments',DormAssignmentsController::class);
+Route::apiResource('/grades',GradesController::class);
+Route::apiResource('/mudaris',MudarisController::class);
+Route::apiResource('/santri',SantriController::class);
+Route::apiResource('/subjects',SubjectsController::class);

@@ -42,19 +42,59 @@ class GradesController extends Controller
             ], 422);
         }
 
-        $grades = grades::updateOrCreate(
-            [
-                'santri_id' => $request->santri_id,
-                'subject_id' => $request->subject_id
-            ],
-            ['grade' => $request->grade]
-        );
+        $grades = grades::Create([
+            'santri_id' => $request->santri_id,
+            'subject_id' => $request->subject_id,
+            'grade' => $request->grade
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Grade saved successfully!',
             'data' => $grades
         ], 201);
+    }
+
+    public function update(string $id, Request $request)
+    {
+
+        $grades = grades::find($id);
+
+        if (!$grades) {
+            return response()->json([
+                "success" => false,
+                "message" => "resources not found"
+            ], 404);
+        }
+
+        // 1. validator 
+        $validator = Validator::make($request->all(), [
+            'santri_id' => 'required|exists:santri,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'grade' => 'required|integer|min:0|max:100',
+        ]);
+
+        // 2. check validator error 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $data = [
+            'santri_id' => $request->santri_id,
+            'subject_id' => $request->subject_id,
+            'grade' => $request->grade
+        ];
+
+        $grades->update($data);
+
+        return response()->json([
+            "success" => true,
+            "message" => "resources updated",
+            "data" => $grades
+        ], 200);
     }
 
     public function show(string $id)
