@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->integer('capacity');
-            $table->unsignedBigInteger('mudaris_id');
-            $table->foreign('mudaris_id')->references('id')->on('mudaris')->onDelete('cascade');
+            $table->foreignId('mudaris_id')->constrained('mudaris')->onDelete('cascade');
             $table->timestamps();
         });
     }

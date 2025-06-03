@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('dorm_assignments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('santri_id');
-            $table->unsignedBigInteger('dorm_id');
+            $table->foreignId('santri_id')->constrained('santri')->onDelete('cascade');
+            $table->foreignId('dorm_id')->constrained('dorms')->onDelete('cascade');
             $table->date('entry_date');
-            $table->date('exit_date');
-
-            $table->foreign('santri_id')->references('id')->on('santri')->onDelete('cascade');
-            $table->foreign('dorm_id')->references('id')->on('dorms')->onDelete('cascade');
+            $table->date('exit_date')->nullable();
+            $table->timestamps();
         });
     }
 

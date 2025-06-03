@@ -11,4 +11,9 @@ class dorms extends Model
     protected $fillable = [
         'name', 'capacity', 'mudaris_id'
     ];
+
+    public function mudaris()
+    {
+        return $this->belongsTo(mudaris::class);
+    }
 }

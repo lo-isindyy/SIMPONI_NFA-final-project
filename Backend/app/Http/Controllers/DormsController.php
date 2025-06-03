@@ -10,7 +10,7 @@ class DormsController extends Controller
 {
     public function index()
     {
-        $dorms = dorms::all();
+        $dorms = dorms::with('mudaris')->get();;
 
         if ($dorms->isEmpty()) {
             return response()->json([

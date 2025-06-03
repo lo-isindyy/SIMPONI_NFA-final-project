@@ -10,9 +10,9 @@ class DormAssignmentsController extends Controller
 {
     public function index()
     {
-        $dorm_assignments = dorm_assignments::all();
+        $assignments = dorm_assignments::with('santri', 'dorm')->get();
 
-        if ($dorm_assignments->isEmpty()) {
+        if ($assignments->isEmpty()) {
             return response()->json([
                 "success" => true,
                 "message" => "Resouces data not found!"
@@ -24,7 +24,7 @@ class DormAssignmentsController extends Controller
         return response()->json([
             "success" => true,
             "message" => "Get All Resources",
-            "data" => $dorm_assignments
+            "data" => $assignments
         ], 200);
     }
 
@@ -35,7 +35,7 @@ class DormAssignmentsController extends Controller
             'santri_id' => 'required|exists:santri,id',
             'dorm_id' => 'required|exists:dorms,id',
             'entry_date' => 'required|date',
-            'exit_date' => 'required|date|after_or_equal:entry_date',
+            'exit_date' => 'nullable|date|after_or_equal:entry_date',
         ]);
 
         // 2. Jika gagal validasi
@@ -79,7 +79,7 @@ class DormAssignmentsController extends Controller
             'santri_id' => 'required|exists:santri,id',
             'dorm_id' => 'required|exists:dorms,id',
             'entry_date' => 'required|date',
-            'exit_date' => 'required|date|after_or_equal:entry_date',
+            'exit_date' => 'nullable|date|after_or_equal:entry_date',
         ]);
 
         // 2. check validator error 

@@ -16,11 +16,8 @@ return new class extends Migration
             $table->string('name', 50);
             $table->dateTime('day');
             $table->year('year');
-            $table->unsignedBigInteger('classroom_id');
-            $table->unsignedBigInteger('mudaris_id');
-
-            $table->foreign('classroom_id')->references('id')->on('classrooms')->onDelete('cascade');
-            $table->foreign('mudaris_id')->references('id')->on('mudaris')->onDelete('cascade');
+            $table->foreignId('classroom_id')->constrained('classrooms')->onDelete('cascade');
+            $table->foreignId('mudaris_id')->constrained('mudaris')->onDelete('cascade');
             $table->timestamps();
         });
     }
