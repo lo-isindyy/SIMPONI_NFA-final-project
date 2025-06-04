@@ -10,7 +10,7 @@ class SubjectsController extends Controller
 {
     public function index()
     {
-        $subjects = subjects::with('classroom','mudaris');
+        $subjects = subjects::with('classroom','mudaris')->get();
 
         if ($subjects->isEmpty()) {
             return response()->json([

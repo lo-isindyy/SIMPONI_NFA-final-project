@@ -10,7 +10,7 @@ class GradesController extends Controller
 {
     public function index()
     {
-        $grades = grades::with('santri','subject');
+        $grades = grades::with('santri','subject')->get();
 
         if ($grades->isEmpty()) {
             return response()->json([
