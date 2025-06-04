@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\dorm_assignments;
+use App\Models\dorms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -44,6 +45,30 @@ class DormAssignmentsController extends Controller
                 'success' => false,
                 'message' => $validator->errors()
             ], 422);
+        }
+
+        $dorm = dorms::find($request->dorm_id);
+
+        if (!$dorm) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dorm tidak ditemukan.'
+            ], 404);
+        }
+
+        $currentCount = dorm_assignments::where('dorm_id', $dorm->id)
+            ->where(function ($query) {
+                $query->whereNull('exit_date')
+                    ->orWhere('exit_date', '>', now());
+            })
+            ->count();
+
+        // 5. Cek apakah kapasitas sudah penuh
+        if ($currentCount >= $dorm->capacity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kamar sudah penuh.'
+            ], 409);
         }
 
         // 3. Simpan data
