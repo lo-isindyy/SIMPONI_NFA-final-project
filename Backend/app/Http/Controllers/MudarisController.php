@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\mudaris;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MudarisController extends Controller
@@ -35,6 +36,7 @@ class MudarisController extends Controller
             'gender' => 'required|in:Laki-laki,Perempuan',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
+            'pp_mudaris' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         // 2. Jika validasi gagal
@@ -45,13 +47,18 @@ class MudarisController extends Controller
             ], 422);
         }
 
+            $image = $request->file('pp_mudaris');
+        $image->store('mudaris', 'public');
+
         // 3. Simpan ke DB
         $mudaris = Mudaris::create([
             'name' => $request->name,
             'gender' => $request->gender,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
+            'pp_mudaris' => $image->hashName(),
         ]);
+
 
         // 4. Response
         return response()->json([
@@ -97,6 +104,7 @@ class MudarisController extends Controller
             'gender' => 'required|in:Laki-laki,Perempuan',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
+            'pp_mudaris' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         // 2. check validator error 
@@ -113,6 +121,17 @@ class MudarisController extends Controller
             'address' => $request->address,
             'no_hp' => $request->no_hp,
         ];
+
+        if ($request->hasFile('pp_mudaris')) {
+            $image = $request->file('pp_mudaris');
+            $image->store('mudaris', 'public');
+
+            if ($mudaris->pp_mudaris) {
+                Storage::disk('public')->delete('books/' . $mudaris->pp_mudaris);
+            }
+
+            $data['pp_mudaris'] = $image->hashName();
+        }
 
         $mudaris->update($data);
 
@@ -132,6 +151,10 @@ class MudarisController extends Controller
                 "success" => false,
                 "message" => "resources not found"
             ], 404);
+        }
+
+        if ($mudaris->pp_mudaris) {
+            Storage::disk('public')->delete('mudaris/' . $mudaris->pp_mudaris);
         }
 
         $mudaris->delete();

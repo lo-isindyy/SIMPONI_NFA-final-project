@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\santri;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class SantriController extends Controller
@@ -33,9 +34,10 @@ class SantriController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'gender' => 'required|string',
-            'tgl_lahir' => 'required|date',
-            'address' => 'required|string',
-            'no_hp' => 'required|string|max:25',
+            'tgl_lahir' => 'nullable|date',
+            'address' => 'nullable|string',
+            'no_hp' => 'nullable|string|max:25',
+            'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
         ]);
 
         // 2. Jika validasi gagal
@@ -46,6 +48,9 @@ class SantriController extends Controller
             ], 422);
         }
 
+        $image = $request->file('pp_santri');
+        $image->store('santri', 'public');
+
         // 3. Simpan data ke database
         $santri = Santri::create([
             'name' => $request->name,
@@ -53,6 +58,7 @@ class SantriController extends Controller
             'tgl_lahir' => $request->tgl_lahir,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
+            'pp_santri' => $image->hashName(),
         ]);
 
         // 4. Beri response
@@ -97,9 +103,10 @@ class SantriController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'gender' => 'required|string',
-            'tgl_lahir' => 'required|date',
-            'address' => 'required|string',
-            'no_hp' => 'required|string|max:25',
+            'tgl_lahir' => 'nullable|date',
+            'address' => 'nullable|string',
+            'no_hp' => 'nullable|string|max:25',
+            'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
         ]);
 
         // 2. check validator error 
@@ -117,6 +124,17 @@ class SantriController extends Controller
             'address' => $request->address,
             'no_hp' => $request->no_hp,
         ];
+
+        if ($request->hasFile('pp_santri')) {
+            $image = $request->file('pp_santri');
+            $image->store('santri', 'public');
+
+            if ($santri->pp_santri) {
+                Storage::disk('public')->delete('santri/' . $santri->pp_santri);
+            }
+
+            $data['pp_santri'] = $image->hashName();
+        }
 
         $santri->update($data);
 
@@ -136,6 +154,10 @@ class SantriController extends Controller
                 "success" => false,
                 "message" => "resources not found"
             ], 404);
+        }
+
+        if ($santri->pp_santri) {
+            Storage::disk('public')->delete('santri/' . $santri->pp_santri);
         }
 
         $santri->delete();

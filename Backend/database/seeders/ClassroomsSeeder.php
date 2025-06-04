@@ -12,6 +12,6 @@ class ClassroomsSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        
     }
 }

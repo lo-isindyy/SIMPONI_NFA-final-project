@@ -19,6 +19,7 @@ class SantriSeeder extends Seeder
                 'tgl_lahir' => '2005-04-10',
                 'address' => 'Jl. Merpati No. 12, Surabaya',
                 'no_hp' => '081234567890'
+                
         ]);
         santri::create([
                 'name' => 'Budi Santoso',
