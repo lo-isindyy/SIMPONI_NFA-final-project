@@ -49,13 +49,6 @@ class DormAssignmentsController extends Controller
 
         $dorm = dorms::find($request->dorm_id);
 
-        if (!$dorm) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Dorm tidak ditemukan.'
-            ], 404);
-        }
-
         $currentCount = dorm_assignments::where('dorm_id', $dorm->id)
             ->where(function ($query) {
                 $query->whereNull('exit_date')

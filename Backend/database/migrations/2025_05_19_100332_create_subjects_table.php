@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->dateTime('day');
             $table->year('year');
+            $table->string('jenjang');
             $table->foreignId('classroom_id')->constrained('classrooms')->onDelete('cascade');
             $table->foreignId('mudaris_id')->constrained('mudaris')->onDelete('cascade');
             $table->timestamps();

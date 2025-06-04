@@ -12,6 +12,7 @@ class subjects extends Model
         'name',
         'day',
         'year',
+        'jenjang',
         'classroom_id',
         'mudaris_id',
     ];

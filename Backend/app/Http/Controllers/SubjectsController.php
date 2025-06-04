@@ -33,6 +33,7 @@ class SubjectsController extends Controller
             'name' => 'required|string|max:50',
             'day' => 'required|date_format:Y-m-d H:i:s',
             'year' => 'required|digits:4|integer',
+            'jenjang' => 'required|string',
             'classroom_id' => 'required|exists:classrooms,id',
             'mudaris_id' => 'required|exists:mudaris,id',
         ]);
@@ -49,6 +50,7 @@ class SubjectsController extends Controller
             'name' => $request->name,
             'day' => $request->day,
             'year' => $request->year,
+            'jenjang' => $request->jenjang,
             'classroom_id' => $request->classroom_id,
             'mudaris_id' => $request->mudaris_id,
         ]);
@@ -96,6 +98,7 @@ class SubjectsController extends Controller
             'name' => 'required|string|max:50',
             'day' => 'required|date_format:Y-m-d H:i:s',
             'year' => 'required|digits:4|integer',
+            'jenjang' => 'required|string',
             'classroom_id' => 'required|exists:classrooms,id',
             'mudaris_id' => 'required|exists:mudaris,id',
         ]);
@@ -112,6 +115,7 @@ class SubjectsController extends Controller
             'name' => $request->name,
             'day' => $request->day,
             'year' => $request->year,
+            'jenjang' => $request->jenjang,
             'classroom_id' => $request->classroom_id,
             'mudaris_id' => $request->mudaris_id,
         ];

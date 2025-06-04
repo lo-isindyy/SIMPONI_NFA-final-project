@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->string('gender', 10);
-            $table->string('address');
-            $table->string('no_hp');
-            $table->string('pp_mudaris');
+            $table->string('address')->nullable();
+            $table->string('no_hp')->nullable();
+            $table->string('pp_mudaris')->nullable();
             $table->timestamps();
         });
     }

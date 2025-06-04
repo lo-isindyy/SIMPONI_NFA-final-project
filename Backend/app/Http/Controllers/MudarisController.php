@@ -127,7 +127,7 @@ class MudarisController extends Controller
             $image->store('mudaris', 'public');
 
             if ($mudaris->pp_mudaris) {
-                Storage::disk('public')->delete('books/' . $mudaris->pp_mudaris);
+                Storage::disk('public')->delete('mudaris/' . $mudaris->pp_mudaris);
             }
 
             $data['pp_mudaris'] = $image->hashName();
