@@ -31,7 +31,7 @@ class SubjectsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'day' => 'required|date_format:Y-m-d H:i:s',
+            'day' => 'required|string',
             'year' => 'required|digits:4|integer',
             'jenjang' => 'required|string',
             'classroom_id' => 'required|exists:classrooms,id',
@@ -96,7 +96,7 @@ class SubjectsController extends Controller
         // 1. validator 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'day' => 'required|date_format:Y-m-d H:i:s',
+            'day' => 'required|string',
             'year' => 'required|digits:4|integer',
             'jenjang' => 'required|string',
             'classroom_id' => 'required|exists:classrooms,id',
