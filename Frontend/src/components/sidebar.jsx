@@ -1,213 +1,221 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { MdDashboard } from 'react-icons/md';
+import {
+  FaUserGraduate,
+  FaUserTie,
+  FaChalkboardTeacher,
+  FaBookOpen,
+  FaStar,
+  FaBuilding,
+  FaUserCog,
+  FaSignOutAlt,
+} from 'react-icons/fa';
+import { IoMdMenu, IoMdClose } from 'react-icons/io';
 
-const menuItems = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'santri', label: 'Data Santri' },
-  { key: 'ustadz', label: 'Data Ustadz' },
-  { key: 'jadwal', label: 'Penjadwalan' },
-  { key: 'asrama', label: 'Asrama', hasDropdown: true },
-  { key: 'kelas', label: 'Ruang Kelas' },
-  { key: 'nilai', label: 'Penilaian' },
-  { key: 'logout', label: 'Logout' },
-];
+const Sidebar = ({ currentPage, isOpen, setIsOpen }) => {
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-const Sidebar = ({ currentPage, onChangePage }) => {
-  const [openDropdown, setOpenDropdown] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
-  const toggleDropdown = () => {
-    setOpenDropdown((prev) => !prev);
-  };
+  const menuItems = [
+    { label: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
+    { label: 'Data Santri', icon: <FaUserGraduate />, path: '/santri' },
+    { label: 'Data Mudaris', icon: <FaUserTie />, path: '/ustadz' },
+    { label: 'Data Ruang Kelas', icon: <FaChalkboardTeacher />, path: '/ruang-kelas' },
+    { label: 'Data Mata Pelajaran', icon: <FaBookOpen />, path: '/jadwal' },
+    { label: 'Nilai', icon: <FaStar />, path: '/nilai' },
+    { label: 'Data Asrama', icon: <FaBuilding />, dropdown: true },
+    { label: 'User', icon: <FaUserCog />, path: '/login' },
+  ];
+
+  const handleNavigate = (path) => navigate(path);
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      navigate('/login'); 
+    if (window.confirm('Yakin ingin logout?')) {
+      navigate('/login');
     }
   };
 
   return (
-    <>
-      <style>{`
-        :root {
-          --color-primary: #4f46e5;
-          --color-white: #ffffff;
-          --color-green: #10b981;
-          --sidebar-width: 250px;
-          --navbar-height: 60px;
-        }
-        /* Sidebar */
+    <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+      <div className="top">
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          {isOpen ? <IoMdClose size={24} /> : <IoMdMenu size={24} />}
+        </button>
+        {isOpen && <h2>SIMPONI</h2>}
+      </div>
+
+      <div className="menu">
+        {menuItems.map((item, idx) => (
+          <div key={idx}>
+            {!item.dropdown ? (
+              <button
+                className={`menu-item ${currentPage === item.path ? 'active' : ''}`}
+                onClick={() => handleNavigate(item.path)}
+              >
+                {item.icon}
+                {isOpen && <span>{item.label}</span>}
+              </button>
+            ) : (
+              <>
+                <button
+                  className="menu-item"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  {item.icon}
+                  {isOpen && <span>{item.label}</span>}
+                  {isOpen && (
+                    <span className={`arrow ${dropdownOpen ? 'open' : ''}`}>▶</span>
+                  )}
+                </button>
+                {dropdownOpen && isOpen && (
+                  <div className="dropdown">
+                    <button
+                      onClick={() => handleNavigate('/asrama')}
+                      className={currentPage === '/asrama' ? 'active' : ''}
+                    >
+                      Kamar
+                    </button>
+                    <button
+                      onClick={() => handleNavigate('/pembagian-kamar')}
+                      className={currentPage === '/pembagian-kamar' ? 'active' : ''}
+                    >
+                      Pembagian Kamar
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="logout">
+        <button className="menu-item" onClick={handleLogout}>
+          <FaSignOutAlt />
+          {isOpen && <span>Logout</span>}
+        </button>
+      </div>
+
+      {/* CSS */}
+      <style jsx>{`
         .sidebar {
-          position: fixed;
-          top: 0; left: 0;
-          width: var(--sidebar-width);
+          background: #4f46e5;
+          color: white;
           height: 100vh;
-          background-color: var(--color-primary);
-          color: var(--color-white);
+          padding: 1rem;
           display: flex;
           flex-direction: column;
-          padding: 1rem 0;
-          z-index: 100;
-          overflow-y: auto;
-          scrollbar-width: thin; 
-          scrollbar-color: #aaa transparent;
+          justify-content: space-between;
+          position: fixed;
+          transition: width 0.3s ease;
         }
-        .sidebar h2 {
-          font-weight: 600;
-          text-align: center;
+
+        .sidebar.open {
+          width: 250px;
+        }
+
+        .sidebar.closed {
+          width: 70px;
+        }
+
+        .top {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
           margin-bottom: 2rem;
-          font-size: 1.75rem;
-          letter-spacing: 2px;
-          user-select: none;
         }
-        .divider {
-          height: 1px;
-          background-color: rgba(255, 255, 255, 255);
-          margin: 0 1.5rem 1rem;
-        }
-        .nav-links {
-          list-style: none;
-          padding-left: 0;
-          margin: 0;
-          flex-grow: 1;
-        }
-        .nav-links li {
-          margin: 0.8rem 0;
-        }
-        .nav-links button {
-          width: 100%;
-          text-align: left;
+
+        .toggle-btn {
           background: none;
           border: none;
-          color: var(--color-white);
-          font-weight: 500;
-          padding: 0.6rem 2rem;
-          border-left: 4px solid transparent;
+          color: white;
           cursor: pointer;
-          user-select: none;
-          transition: background-color 0.3s ease;
-          font-family: inherit;
-          font-size: 1rem;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          font-weight: bold;
+        }
+
+        .menu {
           display: flex;
-          justify-content: space-between;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .menu-item {
+          display: flex;
           align-items: center;
+          gap: 1rem;
+          background: none;
+          border: none;
+          color: white;
+          padding: 0.75rem;
+          font-size: 1rem;
+          text-align: left;
+          width: 100%;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.3s;
         }
-        .nav-links button:hover,
-        .nav-links button.active {
-          background-color: #4338ca;
-          border-left-color: var(--color-green);
-          outline: none;
+
+        .menu-item:hover,
+        .menu-item.active {
+          background: #4338ca;
         }
-        .nav-links button:focus {
-          outline: 2px solid var(--color-green);
-          outline-offset: -2px;
-        }
+
         .dropdown {
-          padding-left: 3rem;
-          display: ${openDropdown ? 'block' : 'none'};
+          margin-left: 2rem;
+          margin-top: 0.25rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
         }
+
         .dropdown button {
-          padding: 0.5rem 0;
+          background: none;
+          border: none;
+          color: #e5e7eb;
+          font-size: 0.95rem;
+          text-align: left;
+          padding: 0.5rem 0.75rem;
+          border-radius: 6px;
         }
+
+        .dropdown button.active,
+        .dropdown button:hover {
+          background-color: #3730a3;
+          color: white;
+        }
+
+        .logout {
+          margin-top: auto;
+        }
+
         .arrow {
+          margin-left: auto;
           transition: transform 0.3s ease;
-          fill: var(--color-white);
-          width: 12px;
-          height: 12px;
-          flex-shrink: 0;
-          margin-left: 5px;
         }
+
         .arrow.open {
           transform: rotate(90deg);
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-          :root {
-            --sidebar-width: 70px;
-          }
-          .sidebar {
-            width: var(--sidebar-width);
-            padding: 1rem 0.3rem;
-          }
-          .sidebar h2 {
-            font-size: 1rem;
-            letter-spacing: 1px;
-            margin-bottom: 1.5rem;
-            display: none;
-            padding-top: 0;
-          }
-          .nav-links button {
-            padding: 0.6rem 0.6rem;
-            border: none;
-            text-align: center;
-            justify-content: center;
-          }
-          .nav-links button span {
-            display: none;
-          }
-          .arrow {
-            display: none;
-          }
+        .sidebar {
+          position: absolute;
+          z-index: 1000;
+          height: 100%;
+          top: 0;
+          left: 0;
         }
+      }
+
       `}</style>
-      <aside className="sidebar" aria-label="Sidebar Navigation">
-        <h2>SIMPONI</h2>
-        <hr className="divider" />
-        <ul className="nav-links">
-          {menuItems.map(({ key, label, hasDropdown }) => (
-            <li key={key}>
-              <button
-                type="button"
-                className={currentPage === key ? 'active' : ''}
-                onClick={() => {
-                  if (key === 'logout') {
-                    handleLogout(); // Call handleLogout on logout
-                  } else if (hasDropdown) {
-                    toggleDropdown();
-                  } else {
-                    onChangePage(key);
-                  }
-                }}
-                aria-current={currentPage === key ? 'page' : undefined}
-                aria-expanded={hasDropdown ? openDropdown : undefined}
-                aria-haspopup={hasDropdown ? 'true' : undefined}
-              >
-                <span>{label}</span>
-                {hasDropdown && (
-                  <svg
-                    className={`arrow ${openDropdown ? 'open' : ''}`}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </button>
-              {hasDropdown && openDropdown && (
-                <div className="dropdown">
-                  <button
-                    type="button"
-                    onClick={() => onChangePage('asrama')}
-                    className={currentPage === 'asrama' ? 'active' : ''}
-                  >
-                    Kamar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onChangePage('pembagian')}
-                    className={currentPage === 'pembagian' ? 'active' : ''}
-                  >
-                    Pembagian Kamar
-                  </button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </aside>
-    </>
+    </aside>
   );
 };
 
