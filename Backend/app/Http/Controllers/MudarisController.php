@@ -33,7 +33,7 @@ class MudarisController extends Controller
         // 1. Validasi data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'gender' => 'required|in:Laki-laki,Perempuan',
+            // 'gender' => 'required|in:Laki-laki,Perempuan',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
             'pp_mudaris' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
@@ -47,8 +47,12 @@ class MudarisController extends Controller
             ], 422);
         }
 
-            $image = $request->file('pp_mudaris');
-        $image->store('mudaris', 'public');
+        $imageName = null;
+        if ($request->hasFile('pp_santri')) {
+            $image = $request->file('pp_santri');
+            $image->store('santri', 'public');
+            $imageName = $image->hashName();
+        }
 
         // 3. Simpan ke DB
         $mudaris = Mudaris::create([
@@ -56,7 +60,7 @@ class MudarisController extends Controller
             'gender' => $request->gender,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
-            'pp_mudaris' => $image->hashName(),
+            'pp_mudaris' => $imageName,
         ]);
 
 
@@ -101,7 +105,7 @@ class MudarisController extends Controller
         // 1. validator 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'gender' => 'required|in:Laki-laki,Perempuan',
+            // 'gender' => 'required|in:Laki-laki,Perempuan',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
             'pp_mudaris' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',

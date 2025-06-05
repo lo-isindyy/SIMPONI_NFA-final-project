@@ -10,8 +10,10 @@ class mudaris extends Model
 
     protected $fillable = [
         'name',
-        'gender',
+        // 'gender',
         'address',
         'no_hp',
+        'pp_mudaris',
     ];
+    
 }

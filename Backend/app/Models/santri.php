@@ -10,9 +10,10 @@ class santri extends Model
 
     protected $fillable = [
         'name',
-        'gender',
+        // 'gender',
         'tgl_lahir',
         'address',
-        'no_hp'
+        'no_hp',
+        'pp_santri',
     ];
 }

@@ -33,8 +33,8 @@ class SantriController extends Controller
         // 1. Validasi data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'gender' => 'required|string',
-            'tgl_lahir' => 'nullable|date',
+            // 'gender' => 'required|string',
+            'tgl_lahir' => 'nullable|date_format:Y-m-d|before_or_equal:today',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
             'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
@@ -48,17 +48,21 @@ class SantriController extends Controller
             ], 422);
         }
 
-        $image = $request->file('pp_santri');
-        $image->store('santri', 'public');
+        $imageName = null;
+        if ($request->hasFile('pp_santri')) {
+            $image = $request->file('pp_santri');
+            $image->store('santri', 'public');
+            $imageName = $image->hashName();
+        }
 
         // 3. Simpan data ke database
         $santri = Santri::create([
             'name' => $request->name,
-            'gender' => $request->gender,
+            // 'gender' => $request->gender,
             'tgl_lahir' => $request->tgl_lahir,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
-            'pp_santri' => $image->hashName(),
+            'pp_santri' => $imageName,
         ]);
 
         // 4. Beri response
@@ -89,6 +93,7 @@ class SantriController extends Controller
 
     public function update(string $id, Request $request)
     {
+        // dd($request->all());
 
         $santri = santri::find($id);
 
@@ -102,7 +107,7 @@ class SantriController extends Controller
         // 1. validator 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            'gender' => 'required|string',
+            // 'gender' => 'required|string',
             'tgl_lahir' => 'nullable|date',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
@@ -119,7 +124,7 @@ class SantriController extends Controller
 
         $data = [
             'name' => $request->name,
-            'gender' => $request->gender,
+            // 'gender' => $request->gender,
             'tgl_lahir' => $request->tgl_lahir,
             'address' => $request->address,
             'no_hp' => $request->no_hp,

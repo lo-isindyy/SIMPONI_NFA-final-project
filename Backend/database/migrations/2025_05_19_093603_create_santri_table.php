@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('santri', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50);
-            $table->enum('gender', ['Laki-laki', 'Perempuan']);
+            // $table->enum('gender', ['Laki-laki', 'Perempuan']);
             $table->date('tgl_lahir')->nullable();
             $table->string('address')->nullable();
             $table->string('no_hp')->nullable();
