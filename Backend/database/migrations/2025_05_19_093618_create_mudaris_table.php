@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mudaris', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50);
-            $table->string('gender', 10);
+            $table->enum('gender', ['Laki-laki', 'Perempuan']);
             $table->string('address')->nullable();
             $table->string('no_hp')->nullable();
             $table->string('pp_mudaris')->nullable();

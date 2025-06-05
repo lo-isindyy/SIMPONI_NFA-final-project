@@ -15,7 +15,7 @@ class DormsSeeder extends Seeder
     {
         dorms::create([
             'name' => 'Asrama Putra 1',
-            'capacity' => 20,
+            'capacity' => 3,
             'mudaris_id' => 1,
         ]);
         dorms::create([
