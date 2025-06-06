@@ -48,9 +48,9 @@ class MudarisController extends Controller
         }
 
         $imageName = null;
-        if ($request->hasFile('pp_santri')) {
-            $image = $request->file('pp_santri');
-            $image->store('santri', 'public');
+        if ($request->hasFile('pp_mudaris')) {
+            $image = $request->file('pp_mudaris');
+            $image->store('mudaris', 'public');
             $imageName = $image->hashName();
         }
 
@@ -102,7 +102,7 @@ class MudarisController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             // 'gender' => 'required|in:Laki-laki,Perempuan',
@@ -111,7 +111,7 @@ class MudarisController extends Controller
             'pp_mudaris' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
