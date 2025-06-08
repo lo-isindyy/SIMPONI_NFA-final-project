@@ -16,4 +16,14 @@ class Mudaris extends Model
         'pp_mudaris',
     ];
 
+    public function dorms()
+    {
+        return $this->hasMany(Dorm::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
+
 }

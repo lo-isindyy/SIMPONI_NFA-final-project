@@ -21,4 +21,9 @@ class Santri extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    public function dormAssignments()
+    {
+        return $this->hasMany(DormAssignment::class);
+    }
 }

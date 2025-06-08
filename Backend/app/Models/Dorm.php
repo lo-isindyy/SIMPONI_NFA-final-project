@@ -16,4 +16,9 @@ class Dorm extends Model
     {
         return $this->belongsTo(Mudaris::class);
     }
+
+    public function dormAssignments()
+    {
+        return $this->hasMany(DormAssignment::class);
+    }
 }
