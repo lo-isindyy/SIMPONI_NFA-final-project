@@ -11,7 +11,7 @@ class SubjectController extends Controller
 {
     public function index()
     {
-        $subjects = Subject::with('classroom','mudaris')->get();
+        $subjects = Subject::with('classroom', 'mudaris')->get();
 
         if ($subjects->isEmpty()) {
             return response()->json([

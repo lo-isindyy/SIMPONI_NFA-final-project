@@ -11,7 +11,10 @@ class DormAssignmentController extends Controller
 {
     public function index()
     {
-        $assignments = DormAssignment::with('santri', 'dorm')->get();
+        $assignments = DormAssignment::with(
+            'santri',
+            'dorm.mudaris'
+        )->get();
 
         if ($assignments->isEmpty()) {
             return response()->json([
