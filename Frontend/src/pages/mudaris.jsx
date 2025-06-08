@@ -707,6 +707,7 @@ const Mudaris = () => {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>User ID</th>
                   <th>Nama Lengkap</th>
                   <th>Alamat</th>
                   <th>No. Handphone</th>
@@ -717,6 +718,7 @@ const Mudaris = () => {
               <tbody>
                 {mudarisList.map((mudaris) => (
                   <tr key={mudaris.id}>
+                    <td>{mudaris.id}</td>
                     <td>{mudaris.id}</td>
                     <td>{mudaris.name}</td>
                     <td>{mudaris.address}</td>

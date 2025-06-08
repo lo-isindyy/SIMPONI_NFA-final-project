@@ -44,6 +44,12 @@ const Grades = ({ santrisList = [], subjectsList = [] }) => {
     const subject = subjects.find((s) => s.id === id);
     return subject ? subject.name : "-";
   };
+
+  const getSubjectJenjang = (id) => {
+    const subject = subjects.find((s) => s.id === id);
+    return subject ? subject.jenjang : "-";
+  };
+  
   
   const fetchGrades = async () => {
     try {
@@ -843,7 +849,7 @@ const Grades = ({ santrisList = [], subjectsList = [] }) => {
                   <option value="">Pilih Mata Pelajaran</option>
                   {subjects.map((subject) => (
                     <option key={subject.id} value={subject.id}>
-                      {subject.name}
+                      {subject.name} - {subject.jenjang}
                     </option>
                   ))}
                 </select>
@@ -887,10 +893,10 @@ const Grades = ({ santrisList = [], subjectsList = [] }) => {
                 <tr>
                   <th>Nama Santri</th>
                   <th>Mata Pelajaran</th>
+                  <th>jenjang</th>
                   <th>Nilai</th>
                   <th>Keterangan</th>
                   <th>Tanggal Input</th>
-                  <th>Terakhir Update</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -899,6 +905,7 @@ const Grades = ({ santrisList = [], subjectsList = [] }) => {
                   <tr key={grade.id}>
                     <td>{getSantriName(grade.santri_id)}</td>
                     <td>{getSubjectName(grade.subject_id)}</td>
+                    <td>{getSubjectJenjang(grade.subject_id)}</td>
                     <td>
                       <span
                         className={`grade-badge ${getGradeColor(grade.grade)}`}
@@ -914,7 +921,6 @@ const Grades = ({ santrisList = [], subjectsList = [] }) => {
                       </span>
                     </td>
                     <td>{formatDate(grade.created_at)}</td>
-                    <td>{formatDate(grade.updated_at)}</td>
                     <td className="action-buttons">
                       <button
                         className="btn-edit"

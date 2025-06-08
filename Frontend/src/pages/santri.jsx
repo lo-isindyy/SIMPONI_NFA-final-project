@@ -512,6 +512,7 @@ export default function AdminSantri() {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>User ID</th>
                   <th>Nama</th>
                   <th>Tanggal Lahir</th>
                   <th>Alamat</th>
@@ -523,6 +524,7 @@ export default function AdminSantri() {
               <tbody>
                 {santriList.map(santri => (
                   <tr key={santri.id}>
+                    <td>{santri.id}</td>
                     <td>{santri.id}</td>
                     <td>{santri.name}</td>
                     <td>{new Date(santri.tgl_lahir).toLocaleDateString('id-ID')}</td>
