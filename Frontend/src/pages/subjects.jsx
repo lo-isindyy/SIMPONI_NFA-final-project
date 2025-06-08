@@ -1,162 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import AppLayout from '../components/AppLayout';
+import { useEffect, useState } from "react";
+import AppLayout from "../components/AppLayout";
+import { getSubject, createSubject, updateSubject, deleteSubject,} from "../_services/subject";
+import { getClassroom } from "../_services/classroom";
+import { getMudaris } from "../_services/mudaris";
 
-const Subjects = () => {
-  const [subjectsList, setSubjectsList] = useState([]);
+export default function Subjects() {
+  const [subjects, setSubjects] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+  const [mudaris, setMudaris] = useState([]);
   const [formData, setFormData] = useState({
-    id: '',
-    name: '',
-    day: '',
-    year: '',
-    classroom_id: '',
-    mudaris_id: ''
+    name: "",
+    day: "",
+    year: "",
+    jenjang: "",
+    classroom_id: "",
+    mudaris_id: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-
-  // Data dummy untuk classroom
-  const classroomsList = [
-    { id: 1, name: 'Kelas 1A' },
-    { id: 2, name: 'Kelas 1B' },
-    { id: 3, name: 'Kelas 2A' },
-    { id: 4, name: 'Kelas 2B' },
-    { id: 5, name: 'Kelas 3A' },
-    { id: 6, name: 'Kelas 3B' }
-  ];
-
-  // Data dummy untuk mudaris
-  const mudarisList = [
-    { id: 1, name: 'Ustadz Ahmad Fauzi' },
-    { id: 2, name: 'Ustadz Muhammad Ridwan' },
-    { id: 3, name: 'Ustadzah Siti Khadijah' },
-    { id: 4, name: 'Ustadzah Fatimah Az-Zahra' },
-    { id: 5, name: 'Ustadz Abdullah Hassan' },
-    { id: 6, name: 'Ustadzah Aminah Yusuf' }
-  ];
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    // Data dummy untuk subjects
-    setSubjectsList([
-      {
-        id: 1,
-        name: 'Tahfidz Al-Quran',
-        day: '2024-01-15T08:00',
-        year: 2024,
-        classroom_id: 1,
-        mudaris_id: 1,
-        classroom_name: 'Kelas 1A',
-        mudaris_name: 'Ustadz Ahmad Fauzi'
-      },
-      {
-        id: 2,
-        name: 'Fiqh',
-        day: '2024-01-15T10:00',
-        year: 2024,
-        classroom_id: 2,
-        mudaris_id: 2,
-        classroom_name: 'Kelas 1B',
-        mudaris_name: 'Ustadz Muhammad Ridwan'
-      },
-      {
-        id: 3,
-        name: 'Akidah Akhlak',
-        day: '2024-01-16T09:00',
-        year: 2024,
-        classroom_id: 3,
-        mudaris_id: 3,
-        classroom_name: 'Kelas 2A',
-        mudaris_name: 'Ustadzah Siti Khadijah'
-      },
-      {
-        id: 4,
-        name: 'Bahasa Arab',
-        day: '2024-01-16T11:00',
-        year: 2024,
-        classroom_id: 4,
-        mudaris_id: 4,
-        classroom_name: 'Kelas 2B',
-        mudaris_name: 'Ustadzah Fatimah Az-Zahra'
-      },
-      {
-        id: 5,
-        name: 'Tafsir Al-Quran',
-        day: '2024-01-17T08:30',
-        year: 2024,
-        classroom_id: 5,
-        mudaris_id: 5,
-        classroom_name: 'Kelas 3A',
-        mudaris_name: 'Ustadz Abdullah Hassan'
-      }
-    ]);
+    const fetchData = async () => {
+      const [subjectsData, classroomsData, mudarisData] = await Promise.all([
+        getSubject(),
+        getClassroom(),
+        getMudaris(),
+      ]);
+      setSubjects(subjectsData);
+      setClassrooms(classroomsData);
+      setMudaris(mudarisData);
+    };
+
+    fetchData();
   }, []);
 
+  const getClassroomName = (id) => {
+    const classroom = classrooms.find((c) => c.id === id);
+    return classroom ? classroom.name : "-";
+  };
+  
+  const getMudarisName = (id) => {
+    const m = mudaris.find((m) => m.id === id);
+    return m ? m.name : "-";
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((f) => ({ ...f, [name]: value }));
   };
 
-  const getDayName = (datetime) => {
-    const date = new Date(datetime);
-    return date.toLocaleDateString('id-ID', { weekday: 'long' });
-  };
-
-  const getTime = (datetime) => {
-    const date = new Date(datetime);
-    return date.toLocaleTimeString('id-ID', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      day: "",
+      year: "",
+      jenjang: "",
+      classroom_id: "",
+      mudaris_id: "",
     });
+    setIsEditing(false);
+    setEditId(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const selectedClassroom = classroomsList.find(c => c.id === parseInt(formData.classroom_id));
-    const selectedMudaris = mudarisList.find(m => m.id === parseInt(formData.mudaris_id));
-    
-    if (isEditing) {
-      setSubjectsList(subjectsList.map(s => 
-        s.id === formData.id 
-          ? { 
-              ...formData, 
-              classroom_name: selectedClassroom.name,
-              mudaris_name: selectedMudaris.name,
-              year: parseInt(formData.year),
-              classroom_id: parseInt(formData.classroom_id),
-              mudaris_id: parseInt(formData.mudaris_id)
-            }
-          : s
-      ));
-    } else {
-      setSubjectsList([
-        ...subjectsList, 
-        { 
-          ...formData, 
-          id: Date.now(),
-          classroom_name: selectedClassroom.name,
-          mudaris_name: selectedMudaris.name,
-          year: parseInt(formData.year),
-          classroom_id: parseInt(formData.classroom_id),
-          mudaris_id: parseInt(formData.mudaris_id)
-        }
-      ]);
+
+    try {
+      if (isEditing) {
+        await updateSubject(editId, { ...formData, _method: "PUT" });
+      } else {
+        await createSubject(formData);
+      }
+
+      // refresh data
+      const subjectsData = await getSubject();
+      setSubjects(subjectsData);
+
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menyimpan data");
     }
-    setFormData({ id: '', name: '', day: '', year: '', classroom_id: '', mudaris_id: '' });
-    setIsEditing(false);
   };
 
   const handleEdit = (subject) => {
     setFormData({
-      id: subject.id,
       name: subject.name,
       day: subject.day,
-      year: subject.year.toString(),
-      classroom_id: subject.classroom_id.toString(),
-      mudaris_id: subject.mudaris_id.toString()
+      year: subject.year,
+      jenjang: subject.jenjang,
+      classroom_id: subject.classroom_id,
+      mudaris_id: subject.mudaris_id,
     });
     setIsEditing(true);
+    setEditId(subject.id);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Yakin ingin menghapus jadwal mata pelajaran ini?')) {
-      setSubjectsList(subjectsList.filter(s => s.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus data ini?")) return;
+
+    try {
+      await deleteSubject(id);
+      setSubjects(subjects.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menghapus data");
     }
   };
 
@@ -573,7 +521,7 @@ const Subjects = () => {
 
       <AppLayout currentPage="/jadwal" >
         <nav className="navbar">
-           <h1>Jadwal Mata Pelajaran</h1>
+          <h1>Jadwal Mata Pelajaran</h1>
           <div className="profile" tabIndex="0" aria-label="User Profile">
             <img src="https://i.pravatar.cc/40" alt="User Profile" />
             <span>Admin</span>
@@ -597,21 +545,28 @@ const Subjects = () => {
                   name="name" 
                   value={formData.name} 
                   onChange={handleChange} 
-                  placeholder="Contoh: Tahfidz Al-Quran" 
+                  placeholder="Masukkan Mata Pelajaran" 
                   required 
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="day">Hari & Waktu</label>
-                <input 
+                <label htmlFor="day">Hari</label>
+                <select
                   id="day"
-                  type="datetime-local"
-                  name="day" 
-                  value={formData.day} 
-                  onChange={handleChange} 
-                  required 
-                />
+                  name="day"
+                  value={formData.day}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">---Pilih Hari---</option>
+                  <option value="Senin">Senin</option>
+                  <option value="Selasa">Selasa</option>
+                  <option value="Rabu">Rabu</option>
+                  <option value="Kamis">Kamis</option>
+                  <option value="Jumat">Jumat</option>
+                  <option value="Sabtu">Sabtu</option>
+                </select>
               </div>
               
               <div className="form-group">
@@ -628,6 +583,18 @@ const Subjects = () => {
                   required 
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="jenjang">Jenjang</label>
+                <input
+                  id="jenjang"
+                  name="jenjang"
+                  value={formData.jenjang}
+                  onChange={handleChange}
+                  placeholder="Masukkan Jenjang" 
+                  required
+                />
+              </div>
               
               <div className="form-group">
                 <label htmlFor="classroom_id">Kelas</label>
@@ -638,8 +605,8 @@ const Subjects = () => {
                   onChange={handleChange} 
                   required
                 >
-                  <option value="">Pilih Kelas</option>
-                  {classroomsList.map(classroom => (
+                  <option value="">---Pilih Kelas---</option>
+                  {classrooms.map(classroom => (
                     <option key={classroom.id} value={classroom.id}>
                       {classroom.name}
                     </option>
@@ -656,8 +623,8 @@ const Subjects = () => {
                   onChange={handleChange} 
                   required
                 >
-                  <option value="">Pilih Pengajar</option>
-                  {mudarisList.map(mudaris => (
+                  <option value="">---Pilih Pengajar---</option>
+                  {mudaris.map(mudaris => (
                     <option key={mudaris.id} value={mudaris.id}>
                       {mudaris.name}
                     </option>
@@ -680,59 +647,48 @@ const Subjects = () => {
                   <th>ID</th>
                   <th>Mata Pelajaran</th>
                   <th>Hari</th>
-                  <th>Waktu</th>
                   <th>Tahun</th>
+                  <th>Jenjang</th>
                   <th>Kelas</th>
                   <th>Pengajar</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {subjectsList.map(subject => (
+                {subjects.map(subject => (
                   <tr key={subject.id}>
                     <td>{subject.id}</td>
-                    <td>
-                      <span className={`subject-badge ${
-                        subject.name.toLowerCase().includes('tahfidz') ? 'subject-tahfidz' :
-                        subject.name.toLowerCase().includes('fiqh') ? 'subject-fiqh' :
-                        subject.name.toLowerCase().includes('akidah') ? 'subject-akidah' :
-                        subject.name.toLowerCase().includes('arab') ? 'subject-arabic' :
-                        subject.name.toLowerCase().includes('tafsir') ? 'subject-tafsir' :
-                        'subject-default'
-                      }`}>
-                        {subject.name}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="day-badge">
-                        {getDayName(subject.day)}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="time-badge">
-                        {getTime(subject.day)}
-                      </span>
-                    </td>
+                    <td>{subject.name}</td>
+                    <td>{subject.day}</td>
                     <td>{subject.year}</td>
-                    <td>{subject.classroom_name}</td>
-                    <td>{subject.mudaris_name}</td>
-                    <td className="action-buttons">
-                      <button className="btn-edit" onClick={() => handleEdit(subject)}>
-                        Edit
-                      </button>
-                      <button className="btn-delete" onClick={() => handleDelete(subject.id)}>
-                        Hapus
-                      </button>
+                    <td>{subject.jenjang}</td>
+                    <td>{getClassroomName(subject.classroom_id)}</td>
+                    <td>{getMudarisName(subject.mudaris_id)}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          type="button"
+                          className="btn-edit"
+                          onClick={() => handleEdit(subject)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-delete"
+                          onClick={() => handleDelete(subject.id)}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
-              </tbody>
+            </tbody>
             </table>
           </div>
         </div>
       </AppLayout>
     </>
   );
-};
-
-export default Subjects;
+}

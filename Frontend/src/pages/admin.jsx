@@ -1,50 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import AppLayout from '../components/AppLayout';
+import { DashboardService } from '../_services/dasboard';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalSantri: 0,
     totalUstadz: 0,
     asrama: 0,
-    kelas: 0
+    kelas: 0,
   });
 
-  const [chartData] = useState([
-    { month: 'Jan', santri: 420, ustadz: 89 },
-    { month: 'Feb', santri: 532, ustadz: 95 },
-    { month: 'Mar', santri: 478, ustadz: 102 },
-    { month: 'Apr', santri: 689, ustadz: 118 },
-    { month: 'May', santri: 545, ustadz: 125 },
-    { month: 'Jun', santri: 612, ustadz: 134 }
-  ]);
-
-  const [selectedPeriod, setSelectedPeriod] = useState('6months');
-
-  // Animate numbers on load
   useEffect(() => {
-    const targets = { totalSantri: 5789, totalUstadz: 1234, asrama: 24, kelas: 67 };
-    const duration = 2000;
-    const steps = 60;
-    const increment = duration / steps;
-
-    let current = { totalSantri: 0, totalUstadz: 0, asrama: 0, kelas: 0 };
-    
-    const timer = setInterval(() => {
-      let complete = true;
-      Object.keys(targets).forEach(key => {
-        if (current[key] < targets[key]) {
-          current[key] = Math.min(current[key] + Math.ceil(targets[key] / steps), targets[key]);
-          complete = false;
-        }
-      });
-      
-      setStats({...current});
-      
-      if (complete) clearInterval(timer);
-    }, increment);
-
-    return () => clearInterval(timer);
-  }, []);
+    const el = document.getElementById('dashboard-stats');
+    if (el) {
+      const targets = {
+        totalSantri: parseInt(el.getAttribute('data-total-santri')) || 0,
+        totalUstadz: parseInt(el.getAttribute('data-total-ustadz')) || 0,
+        asrama: parseInt(el.getAttribute('data-asrama')) || 0,
+        kelas: parseInt(el.getAttribute('data-kelas')) || 0,
+      };
+  
+      setStats(targets);
+    }
+  }, []);  
 
   const StatCard = ({ title, value, icon, color, trend }) => (
     <div style={{
@@ -116,168 +94,6 @@ const Dashboard = () => {
           opacity: 0.7
         }}>
           {icon}
-        </div>
-      </div>
-    </div>
-  );
-
-  const InteractiveChart = () => (
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      padding: '1.5rem',
-      marginTop: '2rem',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-      border: '1px solid rgba(0,0,0,0.05)'
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '1.5rem'
-      }}>
-        <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
-          Statistik Pertumbuhan
-        </h3>
-        <select 
-          value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
-          style={{
-            padding: '0.5rem 1rem',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
-            fontSize: '0.9rem',
-            cursor: 'pointer'
-          }}
-        >
-          <option value="6months">6 Bulan Terakhir</option>
-          <option value="1year">1 Tahun Terakhir</option>
-          <option value="2years">2 Tahun Terakhir</option>
-        </select>
-      </div>
-      
-      <div style={{ height: '250px', position: 'relative' }}>
-        <svg width="100%" height="100%" viewBox="0 0 800 250">
-          {/* Grid lines */}
-          {[0, 1, 2, 3, 4].map(i => (
-            <line
-              key={i}
-              x1="60"
-              y1={50 + i * 40}
-              x2="750"
-              y2={50 + i * 40}
-              stroke="#f3f4f6"
-              strokeWidth="1"
-            />
-          ))}
-          
-          {/* Y-axis labels */}
-          {[800, 600, 400, 200, 0].map((val, i) => (
-            <text
-              key={i}
-              x="50"
-              y={55 + i * 40}
-              fontSize="12"
-              fill="#6b7280"
-              textAnchor="end"
-            >
-              {val}
-            </text>
-          ))}
-          
-          {/* Bars and data points */}
-          {chartData.map((data, i) => {
-            const x = 80 + i * 110;
-            const santriHeight = (data.santri / 800) * 160;
-            const ustadzHeight = (data.ustadz / 200) * 160;
-            
-            return (
-              <g key={i}>
-                {/* Santri bars */}
-                <rect
-                  x={x}
-                  y={210 - santriHeight}
-                  width="35"
-                  height={santriHeight}
-                  fill="url(#santriGradient)"
-                  rx="4"
-                  style={{ cursor: 'pointer' }}
-                  onMouseEnter={(e) => e.target.style.opacity = '0.8'}
-                  onMouseLeave={(e) => e.target.style.opacity = '1'}
-                >
-                  <title>{`Santri: ${data.santri}`}</title>
-                </rect>
-                
-                {/* Ustadz bars */}
-                <rect
-                  x={x + 40}
-                  y={210 - ustadzHeight}
-                  width="35"
-                  height={ustadzHeight}
-                  fill="url(#ustadzGradient)"
-                  rx="4"
-                  style={{ cursor: 'pointer' }}
-                  onMouseEnter={(e) => e.target.style.opacity = '0.8'}
-                  onMouseLeave={(e) => e.target.style.opacity = '1'}
-                >
-                  <title>{`Ustadz: ${data.ustadz}`}</title>
-                </rect>
-                
-                {/* Month labels */}
-                <text
-                  x={x + 35}
-                  y={235}
-                  fontSize="12"
-                  fill="#6b7280"
-                  textAnchor="middle"
-                >
-                  {data.month}
-                </text>
-              </g>
-            );
-          })}
-          
-          {/* Gradients */}
-          <defs>
-            <linearGradient id="santriGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#4f46e5" />
-              <stop offset="100%" stopColor="#6366f1" />
-            </linearGradient>
-            <linearGradient id="ustadzGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#34d399" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Legend */}
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          right: '20px',
-          display: 'flex',
-          gap: '1rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem' }}>
-            <div style={{
-              width: '12px',
-              height: '12px',
-              background: 'linear-gradient(135deg, #4f46e5, #6366f1)',
-              borderRadius: '2px',
-              marginRight: '0.5rem'
-            }} />
-            Santri
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem' }}>
-            <div style={{
-              width: '12px',
-              height: '12px',
-              background: 'linear-gradient(135deg, #10b981, #34d399)',
-              borderRadius: '2px',
-              marginRight: '0.5rem'
-            }} />
-            Ustadz
-          </div>
         </div>
       </div>
     </div>
@@ -470,16 +286,12 @@ const Dashboard = () => {
           />
           <StatCard
             title="Kelas"
-            value={`${stats.kelas}%`}
+            value={stats.kelas}
             icon="📚"
             color="#8b5cf6"
             trend={-2.1}
           />
         </section>
-
-        <div className="fade-in">
-          <InteractiveChart />
-        </div>
       </AppLayout>
     </>
   );

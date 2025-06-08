@@ -20,7 +20,7 @@ const Sidebar = ({ currentPage, isOpen, setIsOpen }) => {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const menuItems = [
-    { label: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
+    { label: 'Dashboard', icon: <MdDashboard />, path: '/admin' },
     { label: 'Data Santri', icon: <FaUserGraduate />, path: '/santri' },
     { label: 'Data Mudaris', icon: <FaUserTie />, path: '/ustadz' },
     { label: 'Data Ruang Kelas', icon: <FaChalkboardTeacher />, path: '/ruang-kelas' },

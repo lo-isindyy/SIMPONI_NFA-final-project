@@ -1,69 +1,107 @@
 import React, { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
+import {getMudaris, createMudaris, updateMudaris, deleteMudaris,} from "../_services/mudaris"; // pastikan service ini sudah kamu buat
 
 const Mudaris = () => {
   const [mudarisList, setMudarisList] = useState([]);
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
-    gender: "",
     address: "",
     no_hp: "",
+    pp_mudaris: null,
   });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setMudarisList([
-      {
-        id: 1,
-        name: "Ustadz Ahmad Fauzi",
-        gender: "Laki-laki",
-        address: "Jl. Pesantren No. 123, Jakarta Timur",
-        no_hp: "081234567890",
-      },
-      {
-        id: 2,
-        name: "Ustadz Muhammad Ridwan",
-        gender: "Laki-laki",
-        address: "Jl. Masjid Raya No. 45, Jakarta Selatan",
-        no_hp: "081987654321",
-      },
-    ]);
+    fetchMudaris();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (isEditing) {
-      setMudarisList(
-        mudarisList.map((m) => (m.id === formData.id ? formData : m))
-      );
-    } else {
-      setMudarisList([
-        ...mudarisList,
-        {
-          ...formData,
-          id: Date.now(),
-        },
-      ]);
+  const fetchMudaris = async () => {
+    try {
+      const data = await getMudaris();
+      setMudarisList(data);
+    } catch (error) {
+      console.error("Gagal mengambil data mudaris:", error);
     }
-    setFormData({ id: "", name: "", gender: "", address: "", no_hp: "" });
-    setIsEditing(false);
   };
 
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+  
+    if (name === "pp_mudaris") {
+      setFormData({
+        ...formData,
+        pp_mudaris: files[0], // ambil file pertama
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const payload = new FormData();
+  
+      for (const key in formData) {
+        // append formData[key] jika bukan null atau undefined
+        if (formData[key] !== null && formData[key] !== undefined) {
+          payload.append(key, formData[key]);
+        }
+      }
+  
+      if (isEditing) {
+        payload.append("_method", "PUT");
+        await updateMudaris(formData.id, payload);
+      } else {
+        await createMudaris(payload);
+      }
+  
+      await fetchMudaris();
+      resetForm();
+    } catch (error) {
+      console.error("Gagal menyimpan data:", error);
+      alert("Gagal menyimpan data.");
+    }
+  };  
+  
   const handleEdit = (mudaris) => {
-    setFormData(mudaris);
+    setFormData({
+      id: mudaris.id,
+      name: mudaris.name,
+      address: mudaris.address,
+      no_hp: mudaris.no_hp,
+      pp_mudaris: null, 
+    });
     setIsEditing(true);
   };
+  
 
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus data mudaris ini?")) {
-      setMudarisList(mudarisList.filter((m) => m.id !== id));
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Yakin ingin menghapus data mudaris ini?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteMudaris(id);
+      await fetchMudaris();
+    } catch (error) {
+      console.error("Gagal menghapus data:", error);
+      alert("Gagal menghapus data mudaris.");
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      address: "",
+      no_hp: "",
+      pp_mudaris: null
+    });
+    setIsEditing(false);
   };
 
   return (
@@ -332,24 +370,6 @@ const Mudaris = () => {
           gap: 0.5rem;
         }
 
-        .gender-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .gender-male {
-          background-color: #dbeafe;
-          color: #1e40af;
-        }
-
-        .gender-female {
-          background-color: #fce7f3;
-          color: #be185d;
-        }
 
         .wide-field {
           grid-column: span 2;
@@ -525,25 +545,6 @@ const Mudaris = () => {
           gap: 0.5rem;
         }
 
-        .gender-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .gender-male {
-          background-color: #dbeafe;
-          color: #1e40af;
-        }
-
-        .gender-female {
-          background-color: #fce7f3;
-          color: #be185d;
-        }
-
         @media (max-width: 768px) {
           :root {
             --sidebar-width: 70px;
@@ -655,18 +656,17 @@ const Mudaris = () => {
                 />
               </div>
 
+
               <div className="form-group">
-                <label htmlFor="gender">Jenis Kelamin</label>
-                <select
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
+                <label htmlFor="address">Alamat</label>
+                <input
+                  id="address"
+                  name="address"
+                  value={formData.address}
                   onChange={handleChange}
+                  placeholder="Masukkan alamat lengkap"
                   required
-                >
-                  <option value="">Pilih Jenis Kelamin</option>
-                  <option value="Laki-laki">Laki-laki</option>
-                </select>
+                />
               </div>
 
               <div className="form-group">
@@ -684,14 +684,13 @@ const Mudaris = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="address">Alamat</label>
+                <label htmlFor="pp_mudaris">Foto Mudaris (Opsional)</label>
                 <input
-                  id="address"
-                  name="address"
-                  value={formData.address}
+                  id="pp_mudaris"
+                  type="file"
+                  name="pp_mudaris"
+                  accept="image/*"
                   onChange={handleChange}
-                  placeholder="Masukkan alamat lengkap"
-                  required
                 />
               </div>
             </div>
@@ -709,9 +708,9 @@ const Mudaris = () => {
                 <tr>
                   <th>ID</th>
                   <th>Nama Lengkap</th>
-                  <th>Jenis Kelamin</th>
                   <th>Alamat</th>
                   <th>No. Handphone</th>
+                  <th>Profil</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -720,19 +719,9 @@ const Mudaris = () => {
                   <tr key={mudaris.id}>
                     <td>{mudaris.id}</td>
                     <td>{mudaris.name}</td>
-                    <td>
-                      <span
-                        className={`gender-badge ${
-                          mudaris.gender === "Laki-laki"
-                            ? "gender-male"
-                            : "gender-female"
-                        }`}
-                      >
-                        {mudaris.gender}
-                      </span>
-                    </td>
                     <td>{mudaris.address}</td>
                     <td>{mudaris.no_hp}</td>
+                    <td>{mudaris.pp_mudaris}</td>
                     <td className="action-buttons">
                       <button
                         className="btn-edit"

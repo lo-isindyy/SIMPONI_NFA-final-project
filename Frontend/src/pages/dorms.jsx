@@ -1,104 +1,90 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
+import {getDorms, createDorm, updateDorm, deleteDorm,} from "../_services/dorms";
+import { getMudaris } from "../_services/mudaris";
 
-const Dorms = () => {
-  const [dormsList, setDormsList] = useState([]);
+export default function Dorms() {
+  const [dorms, setDorms] = useState([]);
+  const [mudaris, setMudaris] = useState([]);
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
     capacity: "",
     mudaris_id: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-
-  // Data dummy untuk mudaris (pengasuh asrama)
-  const mudarisList = [
-    { id: 1, name: "Ustadz Ahmad Fauzi" },
-    { id: 2, name: "Ustadz Muhammad Ridwan" },
-    { id: 3, name: "Ustadzah Siti Khadijah" },
-    { id: 4, name: "Ustadzah Fatimah Az-Zahra" },
-  ];
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    setDormsList([
-      {
-        id: 1,
-        name: "Asrama Putra A",
-        capacity: 50,
-        mudaris_id: 1,
-        mudaris_name: "Ustadz Ahmad Fauzi",
-      },
-      {
-        id: 2,
-        name: "Asrama Putra B",
-        capacity: 45,
-        mudaris_id: 2,
-        mudaris_name: "Ustadz Muhammad Ridwan",
-      },
-      {
-        id: 3,
-        name: "Asrama Putri A",
-        capacity: 40,
-        mudaris_id: 3,
-        mudaris_name: "Ustadzah Siti Khadijah",
-      },
-      {
-        id: 4,
-        name: "Asrama Putri B",
-        capacity: 35,
-        mudaris_id: 4,
-        mudaris_name: "Ustadzah Fatimah Az-Zahra",
-      },
-    ]);
+    const fetchData = async () => {
+      const [dormsData, mudarisData] = await Promise.all([
+        getDorms(),
+        getMudaris(),
+      ]);
+      setDorms(dormsData);
+      setMudaris(mudarisData);
+    };
+
+    fetchData();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const getMudarisName = (id) => {
+    const m = mudaris.find((m) => m.id === id);
+    return m ? m.name : "-";
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const selectedMudaris = mudarisList.find(
-      (m) => m.id === parseInt(formData.mudaris_id)
-    );
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((f) => ({ ...f, [name]: value }));
+  };
 
-    if (isEditing) {
-      setDormsList(
-        dormsList.map((d) =>
-          d.id === formData.id
-            ? { ...formData, mudaris_name: selectedMudaris.name }
-            : d
-        )
-      );
-    } else {
-      setDormsList([
-        ...dormsList,
-        {
-          ...formData,
-          id: Date.now(),
-          capacity: parseInt(formData.capacity),
-          mudaris_id: parseInt(formData.mudaris_id),
-          mudaris_name: selectedMudaris.name,
-        },
-      ]);
-    }
-    setFormData({ id: "", name: "", capacity: "", mudaris_id: "" });
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      capacity: "",
+      mudaris_id: "",
+    });
     setIsEditing(false);
+    setEditId(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (isEditing) {
+        await updateDorm(editId, { ...formData, _method: "PUT" });
+      } else {
+        await createDorm(formData);
+      }
+
+      const dormsData = await getDorms();
+      setDorms(dormsData);
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menyimpan data");
+    }
   };
 
   const handleEdit = (dorm) => {
     setFormData({
-      id: dorm.id,
       name: dorm.name,
-      capacity: dorm.capacity.toString(),
-      mudaris_id: dorm.mudaris_id.toString(),
+      capacity: dorm.capacity,
+      mudaris_id: dorm.mudaris_id,
     });
     setIsEditing(true);
+    setEditId(dorm.id);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus data asrama ini?")) {
-      setDormsList(dormsList.filter((d) => d.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus data ini?")) return;
+
+    try {
+      await deleteDorm(id);
+      setDorms(dorms.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menghapus data");
     }
   };
 
@@ -688,7 +674,7 @@ const Dorms = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="mudaris_id">Mudaris (Pengasuh)</label>
+                <label htmlFor="mudaris_id">Mudaris Penanggung Jawab</label>
                 <select
                   id="mudaris_id"
                   name="mudaris_id"
@@ -696,54 +682,54 @@ const Dorms = () => {
                   onChange={handleChange}
                   required
                 >
-                  <option value="">Pilih Mudaris</option>
-                  {mudarisList.map((mudaris) => (
-                    <option key={mudaris.id} value={mudaris.id}>
-                      {mudaris.name}
+                  <option value="">-- Pilih Mudaris --</option>
+                  {mudaris.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <button type="submit" className="btn-primary">
-              {isEditing ? "Update Data Asrama" : "Tambah Data Asrama"}
-            </button>
-          </form>
-        </div>
+                <button type="submit" className="btn-primary">
+                  {isEditing ? "Update" : "Tambah"} Asrama
+                </button>
+              </form>
+            </div>
 
-        <div className="table-container fade-in">
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nama Asrama</th>
-                  <th>Kapasitas</th>
-                  <th>Mudaris (Pengasuh)</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dormsList.map((dorm) => (
+            <div className="table-container fade-in">
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nama Asrama</th>
+                      <th>Kapasitas</th>
+                      <th>Mudaris</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                {dorms.map((dorm) => (
                   <tr key={dorm.id}>
-                    <td>{dorm.id}</td>
                     <td>{dorm.name}</td>
-                    <td>{dorm.capacity} orang</td>
-                    <td>{dorm.mudaris_name}</td>
-                    <td className="action-buttons">
-                      <button
-                        className="btn-edit"
-                        onClick={() => handleEdit(dorm)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(dorm.id)}
-                      >
-                        Hapus
-                      </button>
+                    <td>{dorm.capacity}</td>
+                    <td>{getMudarisName(dorm.mudaris_id)}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="btn-edit"
+                          onClick={() => handleEdit(dorm)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn-delete"
+                          onClick={() => handleDelete(dorm.id)}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -754,6 +740,4 @@ const Dorms = () => {
       </AppLayout>
     </>
   );
-};
-
-export default Dorms;
+}
