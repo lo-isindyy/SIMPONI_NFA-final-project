@@ -6,7 +6,7 @@ use App\Models\Dorm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class DormsController extends Controller
+class DormController extends Controller
 {
     public function index()
     {

@@ -7,11 +7,15 @@ use App\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class GradesController extends Controller
+class GradeController extends Controller
 {
     public function index()
     {
-        $grades = Grade::with('santri','subject')->get();
+        $grades = Grade::with([
+            'santri',
+            'subject.classroom',
+            'subject.mudaris'
+        ])->get();
 
         if ($grades->isEmpty()) {
             return response()->json([

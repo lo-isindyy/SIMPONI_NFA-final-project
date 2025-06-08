@@ -6,7 +6,7 @@ use App\Models\Classroom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ClassroomsController extends Controller
+class ClassroomController extends Controller
 {
     public function index()
     {

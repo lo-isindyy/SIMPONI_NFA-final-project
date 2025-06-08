@@ -7,7 +7,7 @@ use App\Models\DormAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class DormAssignmentsController extends Controller
+class DormAssignmentController extends Controller
 {
     public function index()
     {

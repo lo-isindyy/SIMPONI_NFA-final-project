@@ -7,7 +7,7 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SubjectsController extends Controller
+class SubjectController extends Controller
 {
     public function index()
     {
