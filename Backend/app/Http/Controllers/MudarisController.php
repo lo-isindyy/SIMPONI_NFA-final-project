@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\mudaris;
+use App\Models\Mudaris;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -11,7 +11,7 @@ class MudarisController extends Controller
 {
     public function index()
     {
-        $mudaris = mudaris::all();
+        $mudaris = Mudaris::all();
 
         if ($mudaris->isEmpty()) {
             return response()->json([
@@ -74,7 +74,7 @@ class MudarisController extends Controller
 
     public function show(string $id)
     {
-        $mudaris = mudaris::find($id);
+        $mudaris = Mudaris::find($id);
 
         if (!$mudaris) {
             return response()->json([
@@ -93,7 +93,7 @@ class MudarisController extends Controller
     public function update(string $id, Request $request)
     {
 
-        $mudaris = mudaris::find($id);
+        $mudaris = Mudaris::find($id);
 
         if (!$mudaris) {
             return response()->json([
@@ -148,7 +148,7 @@ class MudarisController extends Controller
 
     public function destroy(string $id)
     {
-        $mudaris = mudaris::find($id);
+        $mudaris = Mudaris::find($id);
 
         if (!$mudaris) {
             return response()->json([

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\dorms;
+use App\Models\Dorm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +10,7 @@ class DormsController extends Controller
 {
     public function index()
     {
-        $dorms = dorms::with('mudaris')->get();;
+        $dorms = Dorm::with('mudaris')->get();;
 
         if ($dorms->isEmpty()) {
             return response()->json([
@@ -45,7 +45,7 @@ class DormsController extends Controller
         }
 
         // 3. Simpan data
-        $dorms = dorms::create([
+        $dorms = Dorm::create([
             'name' => $request->name,
             'capacity' => $request->capacity,
             'mudaris_id' => $request->mudaris_id,
@@ -61,7 +61,7 @@ class DormsController extends Controller
 
     public function show(string $id)
     {
-        $dorms = dorms::find($id);
+        $dorms = Dorm::find($id);
 
         if (!$dorms) {
             return response()->json([
@@ -80,7 +80,7 @@ class DormsController extends Controller
     public function update(string $id, Request $request)
     {
 
-        $dorms = dorms::find($id);
+        $dorms = Dorm::find($id);
 
         if (!$dorms) {
             return response()->json([
@@ -89,14 +89,14 @@ class DormsController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'capacity' => 'required|integer|min:1',
             'mudaris_id' => 'required|exists:mudaris,id',
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -121,7 +121,7 @@ class DormsController extends Controller
 
     public function destroy(string $id)
     {
-        $dorms = dorms::find($id);
+        $dorms = Dorm::find($id);
 
         if (!$dorms) {
             return response()->json([
@@ -137,6 +137,4 @@ class DormsController extends Controller
             "message" => "resources deleted",
         ], 204);
     }
-
-
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class subjects extends Model
+class Subject extends Model
 {
     protected $table = 'subjects';
 
@@ -19,11 +19,16 @@ class subjects extends Model
 
     public function classroom()
     {
-        return $this->belongsTo(classrooms::class);
+        return $this->belongsTo(Classroom::class);
     }
 
     public function mudaris()
     {
-        return $this->belongsTo(mudaris::class);
+        return $this->belongsTo(Mudaris::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
     }
 }

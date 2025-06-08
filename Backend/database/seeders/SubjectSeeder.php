@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\subjects;
+use App\Models\Subject;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class SubjectsSeeder extends Seeder
+class SubjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        subjects::create([
+        Subject::create([
             'name' => 'Tauhid',
             'day' => 'Senin',
             'year' => 2025,
@@ -22,7 +22,7 @@ class SubjectsSeeder extends Seeder
             'mudaris_id' => 1,
         ]);
 
-        subjects::create([
+        Subject::create([
             'name' => 'Fiqih',
             'day' => 'Selasa',
             'year' => 2025,
@@ -31,7 +31,7 @@ class SubjectsSeeder extends Seeder
             'mudaris_id' => 2,
         ]);
 
-        subjects::create([
+        Subject::create([
             'name' => 'Nahwu',
             'day' => 'Rabu',
             'year' => 2025,

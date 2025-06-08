@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use PhpParser\Node\Expr\FuncCall;
 
-class dorm_assignments extends Model
+class DormAssignment extends Model
 {
     protected $table = 'dorm_assignments';
 
@@ -18,11 +17,11 @@ class dorm_assignments extends Model
 
     public function santri()
     {
-        return $this->belongsTo(santri::class);
+        return $this->belongsTo(Santri::class);
     }
 
     public function dorm()
     {
-        return $this->belongsTo(dorms::class);
+        return $this->belongsTo(Dorm::class);
     }
 }

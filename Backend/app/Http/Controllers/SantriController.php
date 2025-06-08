@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\santri;
+use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -11,7 +11,7 @@ class SantriController extends Controller
 {
     public function index()
     {
-        $santri = santri::all();
+        $santri = Santri::all();
 
         if ($santri->isEmpty()) {
             return response()->json([
@@ -75,7 +75,7 @@ class SantriController extends Controller
 
     public function show(string $id)
     {
-        $santri = santri::find($id);
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([
@@ -95,7 +95,7 @@ class SantriController extends Controller
     {
         // dd($request->all());
 
-        $santri = santri::find($id);
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([
@@ -104,7 +104,7 @@ class SantriController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             // 'gender' => 'required|string',
@@ -114,7 +114,7 @@ class SantriController extends Controller
             'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -152,7 +152,7 @@ class SantriController extends Controller
 
     public function destroy(string $id)
     {
-        $santri = santri::find($id);
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([

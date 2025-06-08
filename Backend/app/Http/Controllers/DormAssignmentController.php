@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\dorm_assignments;
-use App\Models\dorms;
+use App\Models\Dorm;
+use App\Models\DormAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -11,7 +11,7 @@ class DormAssignmentsController extends Controller
 {
     public function index()
     {
-        $assignments = dorm_assignments::with('santri', 'dorm')->get();
+        $assignments = DormAssignment::with('santri', 'dorm')->get();
 
         if ($assignments->isEmpty()) {
             return response()->json([
@@ -47,9 +47,9 @@ class DormAssignmentsController extends Controller
             ], 422);
         }
 
-        $dorm = dorms::find($request->dorm_id);
+        $dorm = Dorm::find($request->dorm_id);
 
-        $currentCount = dorm_assignments::where('dorm_id', $dorm->id)
+        $currentCount = DormAssignment::where('dorm_id', $dorm->id)
             ->where(function ($query) {
                 $query->whereNull('exit_date')
                     ->orWhere('exit_date', '>', now());
@@ -65,7 +65,7 @@ class DormAssignmentsController extends Controller
         }
 
         // 3. Simpan data
-        $assignments = dorm_assignments::create([
+        $assignments = DormAssignment::create([
             'santri_id' => $request->santri_id,
             'dorm_id' => $request->dorm_id,
             'entry_date' => $request->entry_date,
@@ -83,7 +83,7 @@ class DormAssignmentsController extends Controller
     public function update(string $id, Request $request)
     {
 
-        $assignments = dorm_assignments::find($id);
+        $assignments = DormAssignment::find($id);
 
         if (!$assignments) {
             return response()->json([
@@ -92,7 +92,7 @@ class DormAssignmentsController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'santri_id' => 'required|exists:santri,id',
             'dorm_id' => 'required|exists:dorms,id',
@@ -100,7 +100,7 @@ class DormAssignmentsController extends Controller
             'exit_date' => 'nullable|date|after_or_equal:entry_date',
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -126,7 +126,7 @@ class DormAssignmentsController extends Controller
 
     public function show(string $id)
     {
-        $assignments = dorm_assignments::find($id);
+        $assignments = DormAssignment::find($id);
 
         if (!$assignments) {
             return response()->json([
@@ -144,7 +144,7 @@ class DormAssignmentsController extends Controller
 
     public function destroy(string $id)
     {
-        $assignments = dorm_assignments::find($id);
+        $assignments = DormAssignment::find($id);
 
         if (!$assignments) {
             return response()->json([

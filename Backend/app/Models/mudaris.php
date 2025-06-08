@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class mudaris extends Model
+class Mudaris extends Model
 {
     protected $table = 'mudaris';
 
@@ -15,5 +15,5 @@ class mudaris extends Model
         'no_hp',
         'pp_mudaris',
     ];
-    
+
 }

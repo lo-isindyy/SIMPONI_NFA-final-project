@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class grades extends Model
+class Grade extends Model
 {
     protected $table = 'grades';
 
@@ -21,6 +21,6 @@ class grades extends Model
 
     public function subject()
     {
-        return $this->belongsTo(subjects::class);
+        return $this->belongsTo(Subject::class);
     }
 }

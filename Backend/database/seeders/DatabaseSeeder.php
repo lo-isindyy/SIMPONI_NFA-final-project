@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SantriSeeder::class,
             MudarisSeeder::class,
-            ClassroomsSeeder::class,
-            DormsSeeder::class,
-            SubjectsSeeder::class,
-            DormAssignmentsSeeder::class,
-            GradesSeeder::class,
+            ClassroomSeeder::class,
+            DormSeeder::class,
+            SubjectSeeder::class,
+            DormAssignmentSeeder::class,
+            GradeSeeder::class,
         ]);
     }
 }

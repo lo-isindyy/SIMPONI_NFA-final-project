@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class dorms extends Model
+class Dorm extends Model
 {
     protected $table = 'dorms';
 
@@ -14,6 +14,6 @@ class dorms extends Model
 
     public function mudaris()
     {
-        return $this->belongsTo(mudaris::class);
+        return $this->belongsTo(Mudaris::class);
     }
 }

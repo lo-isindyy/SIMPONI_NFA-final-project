@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\subjects;
+use App\Models\Subject;
+// use App\Models\subjects;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +11,7 @@ class SubjectsController extends Controller
 {
     public function index()
     {
-        $subjects = subjects::with('classroom','mudaris')->get();
+        $subjects = Subject::with('classroom','mudaris')->get();
 
         if ($subjects->isEmpty()) {
             return response()->json([
@@ -46,7 +47,7 @@ class SubjectsController extends Controller
         }
 
         // 3. Simpan data ke database
-        $subjects = subjects::create([
+        $subjects = Subject::create([
             'name' => $request->name,
             'day' => $request->day,
             'year' => $request->year,
@@ -65,7 +66,7 @@ class SubjectsController extends Controller
 
     public function show(string $id)
     {
-        $subjects = subjects::find($id);
+        $subjects = Subject::find($id);
 
         if (!$subjects) {
             return response()->json([
@@ -84,7 +85,7 @@ class SubjectsController extends Controller
     public function update(string $id, Request $request)
     {
 
-        $subjects = subjects::find($id);
+        $subjects = Subject::find($id);
 
         if (!$subjects) {
             return response()->json([
@@ -93,7 +94,7 @@ class SubjectsController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'day' => 'required|string',
@@ -103,7 +104,7 @@ class SubjectsController extends Controller
             'mudaris_id' => 'required|exists:mudaris,id',
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -131,7 +132,7 @@ class SubjectsController extends Controller
 
     public function destroy(string $id)
     {
-        $subjects = subjects::find($id);
+        $subjects = Subject::find($id);
 
         if (!$subjects) {
             return response()->json([

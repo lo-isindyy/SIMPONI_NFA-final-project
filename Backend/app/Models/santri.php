@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class santri extends Model
+class Santri extends Model
 {
     protected $table = 'santri';
 
@@ -16,4 +16,9 @@ class santri extends Model
         'no_hp',
         'pp_santri',
     ];
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
 }

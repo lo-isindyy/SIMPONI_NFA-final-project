@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\grades;
+use App\Models\Grade;
+// use App\Models\grades;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +11,7 @@ class GradesController extends Controller
 {
     public function index()
     {
-        $grades = grades::with('santri','subject')->get();
+        $grades = Grade::with('santri','subject')->get();
 
         if ($grades->isEmpty()) {
             return response()->json([
@@ -42,7 +43,7 @@ class GradesController extends Controller
             ], 422);
         }
 
-        $grades = grades::Create([
+        $grades = Grade::Create([
             'santri_id' => $request->santri_id,
             'subject_id' => $request->subject_id,
             'grade' => $request->grade
@@ -58,7 +59,7 @@ class GradesController extends Controller
     public function update(string $id, Request $request)
     {
 
-        $grades = grades::find($id);
+        $grades = Grade::find($id);
 
         if (!$grades) {
             return response()->json([
@@ -67,14 +68,14 @@ class GradesController extends Controller
             ], 404);
         }
 
-        // 1. validator 
+        // 1. validator
         $validator = Validator::make($request->all(), [
             'santri_id' => 'required|exists:santri,id',
             'subject_id' => 'required|exists:subjects,id',
             'grade' => 'required|integer|min:0|max:100',
         ]);
 
-        // 2. check validator error 
+        // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -99,7 +100,7 @@ class GradesController extends Controller
 
     public function show(string $id)
     {
-        $grades = grades::find($id);
+        $grades = Grade::find($id);
 
         if (!$grades) {
             return response()->json([
@@ -117,7 +118,7 @@ class GradesController extends Controller
 
     public function destroy(string $id)
     {
-        $grades = grades::find($id);
+        $grades = Grade::find($id);
 
         if (!$grades) {
             return response()->json([

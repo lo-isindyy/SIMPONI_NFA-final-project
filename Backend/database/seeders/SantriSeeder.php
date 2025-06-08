@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\santri;
+use App\Models\Santri;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +13,7 @@ class SantriSeeder extends Seeder
          */
         public function run(): void
         {
-                santri::create([
+                Santri::create([
                         'name' => 'Ahmad Fauzi',
                         // 'gender' => 'Laki-laki',
                         'tgl_lahir' => '2005-04-10',
@@ -21,14 +21,14 @@ class SantriSeeder extends Seeder
                         'no_hp' => '081234567890'
 
                 ]);
-                santri::create([
+                Santri::create([
                         'name' => 'Budi Santoso',
                         // 'gender' => 'Laki-laki',
                         'tgl_lahir' => '2004-12-05',
                         'address' => 'Jl. Melati No. 10, Jakarta',
                         'no_hp' => '082112345678',
                 ]);
-                santri::create([
+                Santri::create([
                         'name' => 'Joko Widodo',
                         // 'gender' => 'Laki-laki',
                         'tgl_lahir' => '2006-01-15',
