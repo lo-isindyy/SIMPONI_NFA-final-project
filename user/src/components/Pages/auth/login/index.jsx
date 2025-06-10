@@ -9,7 +9,7 @@ export default function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (email === "abdullah@example.com" && password === "abdullah123") {
+    if (email === "yuyun@example.com" && password === "yuyun123") {
       navigate("/santri");
     } else {
       alert("Invalid email or password");
