@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/admin";
 import Santri from "./pages/santri"; 
 import Mudaris from "./pages/mudaris"
 import Subjects from "./pages/subjects";
@@ -9,6 +8,7 @@ import DormAssignment from "./pages/DormAssignment";
 import Classrooms from "./pages/classroom";
 import Login from "./login/index";
 import Grades from "./pages/grades";
+import Dashboard from "./pages/dashboard";
 
 
 function App() {

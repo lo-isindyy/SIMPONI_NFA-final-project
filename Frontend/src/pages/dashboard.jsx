@@ -1,28 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import AppLayout from '../components/AppLayout';
-import { DashboardService } from '../_services/dasboard';
+import { getClassroom } from '../_services/classroom';
+import { getDorms } from '../_services/dorms';
+import { getMudaris } from '../_services/mudaris';
+import { getSantri } from '../_services/santri';
 
 const Dashboard = () => {
+  const [santris, setSantris] = useState([]);
+  const [dorms, setDorms] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+  const [mudaris, setMudaris] = useState([]);
   const [stats, setStats] = useState({
     totalSantri: 0,
     totalUstadz: 0,
     asrama: 0,
-    kelas: 0,
+    kelas: 0
   });
 
   useEffect(() => {
-    const el = document.getElementById('dashboard-stats');
-    if (el) {
-      const targets = {
-        totalSantri: parseInt(el.getAttribute('data-total-santri')) || 0,
-        totalUstadz: parseInt(el.getAttribute('data-total-ustadz')) || 0,
-        asrama: parseInt(el.getAttribute('data-asrama')) || 0,
-        kelas: parseInt(el.getAttribute('data-kelas')) || 0,
-      };
-  
-      setStats(targets);
-    }
-  }, []);  
+    const fetchData = async () => {
+      const [santriData, classroomsData, mudarisData, dormsData] = await Promise.all([
+        getSantri(),
+        getClassroom(),
+        getMudaris(),
+        getDorms(),
+      ]);
+
+      setSantris(santriData);
+      setClassrooms(classroomsData);
+      setMudaris(mudarisData);
+      setDorms(dormsData);
+
+      // Hitung total dan set ke state `stats`
+      setStats({
+        totalSantri: santriData.length,
+        totalUstadz: mudarisData.length,
+        asrama: dormsData.length,
+        kelas: classroomsData.length,
+      });
+    };
+
+    fetchData();
+  }, []);
 
   const StatCard = ({ title, value, icon, color, trend }) => (
     <div style={{
@@ -268,28 +287,24 @@ const Dashboard = () => {
             value={stats.totalSantri}
             icon="👥"
             color="#4f46e5"
-            trend={12.5}
           />
           <StatCard
             title="Total Ustadz"
             value={stats.totalUstadz}
             icon="👨‍🏫"
             color="#10b981"
-            trend={8.2}
           />
           <StatCard
             title="Asrama"
             value={stats.asrama}
             icon="🏠"
             color="#f59e0b"
-            trend={0}
           />
           <StatCard
             title="Kelas"
             value={stats.kelas}
             icon="📚"
             color="#8b5cf6"
-            trend={-2.1}
           />
         </section>
       </AppLayout>
