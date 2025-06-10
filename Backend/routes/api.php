@@ -9,6 +9,7 @@ use App\Http\Controllers\SantriController;
 use App\Http\Controllers\SubjectsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,3 +22,11 @@ Route::apiResource('/grades',GradesController::class);
 Route::apiResource('/mudaris',MudarisController::class);
 Route::apiResource('/santri',SantriController::class);
 Route::apiResource('/subjects',SubjectsController::class);
+
+// menambahkan data user baru kedalam database
+Route::post('/register', [AuthController::class, 'register']);
+// mendapatkan data dari database user
+Route::get('/santri', [santriController::class, 'index']);
+
+// login
+Route::post('/login', [AuthController::class, 'login']);

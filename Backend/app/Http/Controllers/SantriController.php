@@ -28,6 +28,7 @@ class SantriController extends Controller
             "data" => $santri
         ], 200);
     }
+
     public function store(Request $request)
     {
         // 1. Validasi data
