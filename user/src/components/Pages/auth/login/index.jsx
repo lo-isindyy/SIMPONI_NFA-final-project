@@ -3,17 +3,47 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const [form, setFrom] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (email === "yuyun@example.com" && password === "yuyun123") {
-      navigate("/santri");
-    } else {
-      alert("Invalid email or password");
+    setErrors({});
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      // console.log(data);
+      if (res.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/dashboards");
+      } else {
+        alert(data.errors || { general: data.message } || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error", error);
+      setErrors({ general: "Terjadi kesalahan pada server" });
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFrom({
+      ...form,
+      [name]: value,
+    });
   };
 
   return (
@@ -83,25 +113,29 @@ export default function Login() {
           <div className="mb-3">
             <input
               type="email"
+              name="email"
               className="form-control"
               placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              // value={email}
+              onChange={handleChange}
               required
               style={{ borderRadius: "8px" }}
             />
           </div>
+          {errors.name && <div style={{ color: "red" }}>{errors.name[0]}</div>}
           <div className="mb-3">
             <input
               type="password"
+              name="password"
               className="form-control"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              // value={password}
+              onChange={handleChange}
               required
               style={{ borderRadius: "8px" }}
             />
           </div>
+          {errors.name && <div style={{ color: "red" }}>{errors.name[0]}</div>}
           <button
             type="submit"
             className="btn btn-primary w-100 rounded-pill py-2 fw-bold"

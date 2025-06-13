@@ -30,3 +30,8 @@ Route::get('/santri', [santriController::class, 'index']);
 
 // login
 Route::post('/login', [AuthController::class, 'login']);
+
+route::middleware(['auth:api'])->group(function () {
+    route::get('/dashboards', [AuthController::class, 'dashboard'])->name('dashboard');
+    
+});
