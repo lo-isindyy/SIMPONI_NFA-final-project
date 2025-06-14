@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('no_hp')->nullable();
             $table->string('pp_mudaris')->nullable();
+            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
             $table->timestamps();
         });
     }
