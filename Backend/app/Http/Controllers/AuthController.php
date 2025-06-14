@@ -16,15 +16,12 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         // 1. validator
-        // 1. validator
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'email' => 'required|email|max:255|unique:users,email',
-            'email' => 'required|email|max255|unique:users',
             'password' => 'required|min:8'
         ]);
 
-        // 2. check validator error
         // 2. check validator error
         if ($validator->fails()) {
             return response()->json([
@@ -59,20 +56,20 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-    public function login(Request $request)
+    public function login (Request $request)
     {
-        $validator = validator::make($request->all(), [
+        $validator = validator::make($request->all(),[
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+        if ($validator->fails()){
+            return response()->json($validator->errors(),422);
         }
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request -> only('email', 'password');
 
-        if (!$token = auth()->guard('api')->attempt($credentials)) {
+        if (!$token = auth()->guard('api')->attempt($credentials)){
             return response()->json([
                 'success' => false,
                 'message' => 'email atau password salah'
@@ -82,7 +79,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login Berhasil',
-            'user'    => auth()->guard('api')->user(),
+            'user'    => auth()-> guard('api') -> user(),
             'token'   => $token
         ], 200);
     }
