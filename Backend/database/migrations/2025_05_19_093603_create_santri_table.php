@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             // $table->enum('gender', ['Laki-laki', 'Perempuan']);
-            $table->foreignId('user_id')->nullable()->constrained('user')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->date('tgl_lahir')->nullable();
             $table->string('address')->nullable();
             $table->string('no_hp')->nullable();
             $table->string('pp_santri')->nullable();
-            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
             $table->timestamps();
         });
     }

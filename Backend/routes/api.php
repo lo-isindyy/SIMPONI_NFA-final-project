@@ -15,13 +15,13 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource('/classrooms',ClassroomsController::class);
-Route::apiResource('/dorms',DormsController::class);
-Route::apiResource('/dorm_asigments',DormAssignmentsController::class);
-Route::apiResource('/grades',GradesController::class);
+Route::apiResource('/classrooms',ClassroomController::class);
+Route::apiResource('/dorms',DormController::class);
+Route::apiResource('/dorm_asigments',DormAssignmentController::class);
+Route::apiResource('/grades',GradeController::class);
 Route::apiResource('/mudaris',MudarisController::class);
 Route::apiResource('/santri',SantriController::class);
-Route::apiResource('/subjects',SubjectsController::class);
+Route::apiResource('/subjects',SubjectController::class);
 
 // menambahkan data user baru kedalam database
 Route::post('/register', [AuthController::class, 'register']);

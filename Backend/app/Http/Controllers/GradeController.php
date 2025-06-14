@@ -9,6 +9,30 @@ use Illuminate\Support\Facades\Validator;
 
 class GradeController extends Controller
 {
+
+    public function indexUser()
+    {
+        $grades = Grade::with([
+            'santri',
+            'subject.classroom',
+            'subject.mudaris'
+        ])->get();
+
+        if ($grades->isEmpty()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Resouces data not found!"
+            ], 200);
+        }
+
+        // return view('grades',['grades' => $grades]);
+
+        return response()->json([
+            "success" => true,
+            "message" => "Get All Resources",
+            "data" => $grades
+        ], 200);
+    }
     public function index()
     {
         $grades = Grade::with([
