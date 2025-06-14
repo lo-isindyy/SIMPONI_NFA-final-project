@@ -3,34 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Santri;
 // use App\Models\grades;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class GradeController extends Controller
 {
 
+
+
     public function indexUser()
     {
-        $grades = Grade::with([
-            'santri',
-            'subject.classroom',
-            'subject.mudaris'
-        ])->get();
+        $user = Auth::user();
+
+        if ($user->role === 'santri') {
+            $grades = Grade::with([
+                'santri',
+                'subject.classroom',
+                'subject.mudaris'
+            ])->where('santri_id', $user->profile_id)->get();
+            
+        } else if ($user->role === 'mudaris') {
+            $grades = Grade::with([
+                'santri',
+                'subject.classroom',
+                'subject.mudaris'
+            ])->get();
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
 
         if ($grades->isEmpty()) {
             return response()->json([
-                "success" => true,
-                "message" => "Resouces data not found!"
+                'success' => true,
+                'message' => 'Data jadwal tidak ditemukan'
             ], 200);
         }
 
-        // return view('grades',['grades' => $grades]);
-
         return response()->json([
-            "success" => true,
-            "message" => "Get All Resources",
-            "data" => $grades
+            'success' => true,
+            'message' => 'Berhasil mengambil data jadwal',
+            'data' => $grades
         ], 200);
     }
     public function index()

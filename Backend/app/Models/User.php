@@ -56,4 +56,13 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(){
         return [];
     }
+
+    public function santri() {
+    return $this->hasOne(Santri::class);
+    }
+    
+    public function mudaris() {
+    return $this->hasOne(Mudaris::class);
+    }
+
 }

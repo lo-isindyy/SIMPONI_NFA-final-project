@@ -15,13 +15,18 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::apiResource('/classrooms',ClassroomController::class);
-Route::apiResource('/dorms',DormController::class);
-Route::apiResource('/dorm_asigments',DormAssignmentController::class);
-Route::apiResource('/grades',GradeController::class);
-Route::apiResource('/mudaris',MudarisController::class);
-Route::apiResource('/santri',SantriController::class);
-Route::apiResource('/subjects',SubjectController::class);
+Route::get('/pembagian', [GradeController::class, 'indexSantri']);
+Route::get('/jadwal', [GradeController::class, 'indexUser']);
+Route::get('/mudarislist', [MudarisController::class, 'availableMudaris']);
+Route::post('/registermudaris', [AuthController::class, 'registerMudaris']);
+Route::get('/santrilist', [SantriController::class, 'availableSantri']);
+Route::apiResource('/classrooms', ClassroomController::class);
+Route::apiResource('/dorms', DormController::class);
+Route::apiResource('/dorm_asigments', DormAssignmentController::class);
+Route::apiResource('/grades', GradeController::class);
+Route::apiResource('/mudaris', MudarisController::class);
+Route::apiResource('/santri', SantriController::class);
+Route::apiResource('/subjects', SubjectController::class);
 
 // menambahkan data user baru kedalam database
 Route::post('/register', [AuthController::class, 'register']);
@@ -33,5 +38,4 @@ Route::post('/login', [AuthController::class, 'login']);
 
 route::middleware(['auth:api'])->group(function () {
     route::get('/dashboards', [AuthController::class, 'dashboard'])->name('dashboard');
-
 });

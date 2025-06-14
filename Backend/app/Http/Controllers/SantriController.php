@@ -9,6 +9,23 @@ use Illuminate\Support\Facades\Validator;
 
 class SantriController extends Controller
 {
+
+    public function availableSantri()
+    {
+        $santri = Santri::whereNull('user_id')->get(['id', 'name']);
+
+        if ($santri->isEmpty()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Resouces data not found!"
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $santri
+        ]);
+    }
     public function index()
     {
         $santri = Santri::all();

@@ -5,10 +5,36 @@ namespace App\Http\Controllers;
 use App\Models\Dorm;
 use App\Models\DormAssignment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class DormAssignmentController extends Controller
 {
+    public function indexSantri()
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'santri') {
+            // Ambil data hanya untuk santri tersebut
+            $kamar = DormAssignment::with(['kamar', 'santri'])
+                ->where('santri_id', $user->profile_id)
+                ->get();
+        } else if ($user->role === 'mudaris') {
+            // Ambil semua data kamar
+            $kamar = DormAssignment::with(['kamar', 'santri'])->get();
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $kamar
+        ]);
+    }
+
     public function index()
     {
         $assignments = DormAssignment::with(
