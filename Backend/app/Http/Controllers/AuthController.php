@@ -6,44 +6,45 @@ use App\Models\Mudaris;
 use App\Models\Santri;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
     public function registerMudaris(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'mudaris_id' => 'required|exists:mudaris,id',
-        'email' => 'required|email|max:255|unique:users,email',
-        'password' => 'required|min:8'
-    ]);
+    {
+        $validator = Validator::make($request->all(), [
+            'mudaris_id' => 'required|exists:mudaris,id',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:8'
+        ]);
 
-    if ($validator->fails()) {
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $mudaris = Mudaris::findOrFail($request->mudaris_id);
+
+        $user = User::create([
+            'name' => $mudaris->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'mudaris',
+        ]);
+
+        $mudaris->user_id = $user->id;
+        $mudaris->save();
+
         return response()->json([
-            'success' => false,
-            'message' => $validator->errors()
-        ], 422);
+            'success' => true,
+            'message' => 'Mudaris berhasil diregistrasi',
+            'data' => $user
+        ], 201);
     }
-
-    $mudaris =Mudaris::findOrFail($request->mudaris_id);
-
-    $user = User::create([
-        'name' => $mudaris->name,
-        'email' => $request->email,
-        'password' => bcrypt($request->password),
-        'role' => 'mudaris',
-    ]);
-
-    $mudaris->user_id = $user->id;
-    $mudaris->save();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Mudaris berhasil diregistrasi',
-        'data' => $user
-    ], 201);
-}
 
     public function showSignupForm()
     {
@@ -53,7 +54,7 @@ class AuthController extends Controller
     {
         // 1. validator
         $validator = Validator::make($request->all(), [
-            'santri_id' => 'required|exists:santris,id',
+            'santri_id' => 'required|exists:santri,id',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|min:8'
         ]);
@@ -127,6 +128,20 @@ class AuthController extends Controller
 
     public function logout()
     {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout Successfully',
+            ], 200);
+        } catch (JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logout Failed!',
+            ], 500);
+        }
+        
         auth()->guard('api')->logout();
         return response()->json([
             'success' => true,

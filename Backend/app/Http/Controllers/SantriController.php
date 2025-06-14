@@ -91,81 +91,87 @@ class SantriController extends Controller
         ], 201);
     }
 
-    public function show(string $id)
+    public function show()
     {
-        $santri = Santri::find($id);
+        $user = auth('api')->user();
 
-        if (!$santri) {
-            return response()->json([
-                "success" => false,
-                "message" => "resources not found"
-            ], 404);
-        }
-
+    if ($user->role !== 'santri') {
         return response()->json([
-            "success" => true,
-            "message" => "Get resources detail",
-            "data" => $santri
-        ], 200);
+            "success" => false,
+            "message" => "Unauthorized access, only santri can view this"
+        ], 403);
     }
 
-    public function update(string $id, Request $request)
-    {
-        // dd($request->all());
+    $santri =Santri::where('user_id', $user->id)->first();
 
-        $santri = Santri::find($id);
-
-        if (!$santri) {
-            return response()->json([
-                "success" => false,
-                "message" => "resources not found"
-            ], 404);
-        }
-
-        // 1. validator
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:50',
-            // 'gender' => 'required|string',
-            'tgl_lahir' => 'nullable|date',
-            'address' => 'nullable|string',
-            'no_hp' => 'nullable|string|max:25',
-            'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
-        ]);
-
-        // 2. check validator error
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()
-            ], 422);
-        }
-
-        $data = [
-            'name' => $request->name,
-            // 'gender' => $request->gender,
-            'tgl_lahir' => $request->tgl_lahir,
-            'address' => $request->address,
-            'no_hp' => $request->no_hp,
-        ];
-
-        if ($request->hasFile('pp_santri')) {
-            $image = $request->file('pp_santri');
-            $image->store('santri', 'public');
-
-            if ($santri->pp_santri) {
-                Storage::disk('public')->delete('santri/' . $santri->pp_santri);
-            }
-
-            $data['pp_santri'] = $image->hashName();
-        }
-
-        $santri->update($data);
-
+    if (!$santri) {
         return response()->json([
-            "success" => true,
-            "message" => "resources updated",
-            "data" => $santri
-        ], 200);
+            "success" => false,
+            "message" => "Santri profile not found"
+        ], 404);
+    }
+
+    return response()->json([
+        "success" => true,
+        "data" => $santri
+    ]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = auth('api')->user();
+
+    if ($user->role !== 'santri') {
+        return response()->json([
+            "success" => false,
+            "message" => "Unauthorized access"
+        ], 403);
+    }
+
+    $santri =Santri::where('user_id', $user->id)->first();
+
+    if (!$santri) {
+        return response()->json([
+            "success" => false,
+            "message" => "Santri profile not found"
+        ], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:50',
+        'tgl_lahir' => 'nullable|date',
+        'address' => 'nullable|string',
+        'no_hp' => 'nullable|string|max:25',
+        'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => $validator->errors()
+        ], 422);
+    }
+
+    $data = $request->only(['name', 'tgl_lahir', 'address', 'no_hp']);
+
+    if ($request->hasFile('pp_santri')) {
+        $image = $request->file('pp_santri');
+        $image->store('santri', 'public');
+
+        if ($santri->pp_santri) {
+            Storage::disk('public')->delete('santri/' . $santri->pp_santri);
+        }
+
+        $data['pp_santri'] = $image->hashName();
+    }
+
+    $santri->update($data);
+
+    return response()->json([
+        "success" => true,
+        "message" => "Profile updated",
+        "data" => $santri
+    ]);
     }
 
     public function destroy(string $id)

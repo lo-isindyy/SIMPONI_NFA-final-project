@@ -15,38 +15,45 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
-
-Route::get('/mudarislist', [MudarisController::class, 'availableMudaris']);
-
+//  ini untuk dropdown register santri
 Route::get('/santrilist', [SantriController::class, 'availableSantri']);
 
-
-
+// ini untuk dropdown mudaris
+Route::get('/mudarislist', [MudarisController::class, 'availableMudaris']);
 
 // menambahkan data user baru kedalam database
 Route::post('/register', [AuthController::class, 'register']);
-// mendapatkan data dari database user
-Route::get('/santri', [santriController::class, 'index']);
 
 // login
 Route::post('/login', [AuthController::class, 'login']);
 
+//  ini bagian mudaris atau user
 route::middleware(['auth:api'])->group(function () {
 
-    Route::get('/pembagian', [GradeController::class, 'indexSantri']);
-    Route::get('/jadwal', [GradeController::class, 'indexUser']);
+    // ini untuk lihat pembagian kamar
+    Route::get('/dorm_asigments', [DormAssignmentController::class, 'indexSantri']);
+
+    //ini untuk melihat pembagian kelas atau jadwal
+    Route::get('/grades', [GradeController::class, 'indexUser']);
+
+    // ini untuk profile
+    Route::apiResource('/santri', SantriController::class)->only('show', 'update');
+
+    // sisanya buat tampil saja
     Route::apiResource('/classrooms', ClassroomController::class)->only('index');
     Route::apiResource('/dorms', DormController::class)->only('index');
-    Route::apiResource('/santri', SantriController::class)->only('show', 'update');
     Route::apiResource('/subjects', SubjectController::class)->only('index');
     Route::apiResource('/mudaris', MudarisController::class)->only('index');
 
-    Route::middleware(['role:admin'])->group(function () {
+    // ini bagian admin atau mudaris
+    Route::middleware(['role:mudaris'])->group(function () {
 
-        Route::post('/registermudaris', [AuthController::class, 'registerMudaris']);
-        Route::apiResource('/dorm_asigments', DormAssignmentController::class);
-        Route::apiResource('/grades', GradeController::class);
+        //  ini untuk tambah mudaris
+        Route::post('/register-mudaris', [AuthController::class, 'registerMudaris']);
+
+
+        Route::apiResource('/dorm_asigments', DormAssignmentController::class)->only('show', 'store', 'update', 'delete');
+        Route::apiResource('/grades', GradeController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/classrooms', ClassroomController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/dorms', DormController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/santri', SantriController::class)->only('index', 'store', 'delete');

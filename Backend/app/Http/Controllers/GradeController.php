@@ -16,22 +16,30 @@ class GradeController extends Controller
 
     public function indexUser()
     {
-        $user = Auth::user();
+        $user = auth('api')->user();
 
         if ($user->role === 'santri') {
+            $santri =Santri::where('user_id', $user->id)->first();
+
+            if (!$santri) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data santri tidak ditemukan'
+                ], 404);
+            }
+
             $grades = Grade::with([
                 'santri',
                 'subject.classroom',
                 'subject.mudaris'
-            ])->where('santri_id', $user->profile_id)->get();
-            
-        } else if ($user->role === 'mudaris') {
+            ])->where('santri_id', $santri->id)->get();
+        } elseif ($user->role === 'mudaris') {
             $grades = Grade::with([
                 'santri',
                 'subject.classroom',
                 'subject.mudaris'
             ])->get();
-
+            
         } else {
             return response()->json([
                 'success' => false,

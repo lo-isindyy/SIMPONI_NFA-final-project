@@ -12,16 +12,25 @@ class DormAssignmentController extends Controller
 {
     public function indexSantri()
     {
-        $user = Auth::user();
+        $user = auth('api')->user();
 
         if ($user->role === 'santri') {
-            // Ambil data hanya untuk santri tersebut
-            $kamar = DormAssignment::with(['kamar', 'santri'])
-                ->where('santri_id', $user->profile_id)
+            $santri = \App\Models\Santri::where('user_id', $user->id)->first();
+
+            if (!$santri) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data santri tidak ditemukan'
+                ], 404);
+            }
+
+            $kamar = DormAssignment::with(['dorm', 'santri'])
+                ->where('santri_id', $santri->id)
                 ->get();
-        } else if ($user->role === 'mudaris') {
-            // Ambil semua data kamar
-            $kamar = DormAssignment::with(['kamar', 'santri'])->get();
+
+        } elseif ($user->role === 'mudaris') {
+            $kamar = DormAssignment::with(['dorm', 'santri'])->get();
+
         } else {
             return response()->json([
                 'success' => false,
