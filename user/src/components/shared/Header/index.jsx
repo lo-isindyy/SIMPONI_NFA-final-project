@@ -26,7 +26,7 @@ export default function Header() {
     "/penilaian",
     "/account",
   ];
-  const showProfileImage = profileImagePaths.includes(location.pathname);
+  // const showProfileImage = profileImagePaths.includes(location.pathname);
 
   const [isDataOpen, setIsDataOpen] = useState(false);
   const [isAsramaOpen, setIsAsramaOpen] = useState(false);
