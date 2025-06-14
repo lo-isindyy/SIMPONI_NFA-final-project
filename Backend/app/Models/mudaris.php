@@ -14,6 +14,7 @@ class Mudaris extends Model
         'address',
         'no_hp',
         'pp_mudaris',
+        'user_id'
     ];
 
     public function dorms()

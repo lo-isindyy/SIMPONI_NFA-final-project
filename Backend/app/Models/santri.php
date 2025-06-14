@@ -15,6 +15,7 @@ class Santri extends Model
         'address',
         'no_hp',
         'pp_santri',
+        'user_id'
     ];
 
     public function grades()
