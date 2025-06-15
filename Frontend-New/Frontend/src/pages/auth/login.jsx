@@ -23,12 +23,14 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
       const response = await login(formData);
       localStorage.setItem("accessToken", response.token);
-      localStorage.setItem("userInfo", JSON.stringify(response.user));
-
+  
+      const userWithPassword = { ...response.user, password: formData.password };
+      localStorage.setItem("userProfile", JSON.stringify(userWithPassword));
+  
       navigate(
         response.user.role === "mudaris"
           ? "/dashboard"
@@ -36,7 +38,6 @@ export default function Login() {
           ? "/publicDashboard"
           : "/"
       );
-      
     } catch (err) {
       setError(err?.response?.data?.message || "Login gagal");
     } finally {

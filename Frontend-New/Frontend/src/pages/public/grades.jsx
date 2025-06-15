@@ -1,39 +1,77 @@
-import React, { useState } from 'react';
-import Header from '../../components/header';
-
-// Data dummy sesuai tabel grades
-const dummyGrades = [
-    { subject: "Tafsir", grade: 80 },
-    { subject: "Fiqih", grade: 85 },
-    { subject: "Nahwu", grade: 78 },
-    { subject: "Sharaf", grade: 88 },
-    { subject: "Balaghah", grade: 90 },
-];
+import { useEffect, useState } from "react";
+import { getGrades } from "../../_services/grades";
+import { useDecodeToken } from "../../_services/auth";
+import Header from "../../components/Header";
 
 export default function PublicGrades() {
+    const [grades, setGrades] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showGrades, setShowGrades] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const santriName = "Abdullah Rahman"; // nama santri contoh
+    const [santriName, setSantriName] = useState("");
+  
+    const token = localStorage.getItem("accessToken");
+    const { success, data: tokenData } = useDecodeToken(token); // ✅ Panggil di sini saja
+  
+    useEffect(() => {
+      const fetchGrades = async () => {
+        try {
+          const allGrades = await getGrades();
+          console.log("Semua nilai dari API:", allGrades);
+  
+          // ❌ Hapus pemanggilan useDecodeToken di sini
+          console.log("Data token setelah decode:", tokenData);
+  
+          if (success && tokenData?.santri_id) {
+            const filtered = allGrades.filter(
+              (g) => g.santri_id === tokenData.santri_id
+            );
+            console.log("Nilai setelah filter:", filtered);
+            setGrades(filtered);
+  
+            // Jika ingin tampilkan nama santri:
+            setSantriName(filtered[0]?.santri?.name || ""); // ✅ ini aman jika ada relasi
+          } else {
+            setGrades([]);
+            setSantriName("");
+          }
+        } catch (error) {
+          console.error("Gagal ambil nilai:", error);
+          setGrades([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchGrades();
+    }, [success, tokenData]); // ✅ dependensi cukup ini
+  
+  const handleShowGrades = () => {
+    setShowGrades(true);
+    if (tokenData?.nama) {
+      setSantriName(tokenData.nama);
+    }
+  };
 
-    const handleShowGrades = () => {
-        setShowGrades(true);
-    };
+  const resetView = () => {
+    setShowGrades(false);
+    setSantriName("");
+    setIsHovered(false);
+  };
 
-    const calculateAverage = () => {
-        const total = dummyGrades.reduce((sum, grade) => sum + grade.grade, 0);
-        return Math.round(total / dummyGrades.length);
-    };
+  const calculateAverage = () => {
+    const total = grades.reduce((sum, g) => sum + g.grade, 0);
+    return grades.length > 0 ? Math.round(total / grades.length) : 0;
+  };
 
-    const getGradeStatus = (grade) => {
-        if (grade >= 85) return { status: 'Sangat Baik', color: '#28a745' };
-        if (grade >= 75) return { status: 'Baik', color: '#17a2b8' };
-        if (grade >= 65) return { status: 'Cukup', color: '#ffc107' };
-        return { status: 'Perlu Perbaikan', color: '#dc3545' };
-    };
+  const getGradeStatus = (grade) => {
+    if (grade >= 85) return { status: "Sangat Baik", color: "#28a745" };
+    if (grade >= 75) return { status: "Baik", color: "#17a2b8" };
+    if (grade >= 65) return { status: "Cukup", color: "#ffc107" };
+    return { status: "Perlu Perbaikan", color: "#dc3545" };
+  };
 
-    const resetView = () => {
-        setShowGrades(false);
-    };
+  if (loading) return <p>Loading...</p>;
 
     return (
         <>
@@ -87,7 +125,7 @@ export default function PublicGrades() {
                                         </div>
                                         <div>
                                             <small className="text-muted fw-medium">Total Mata Pelajaran</small>
-                                            <h4 className="mb-0 fw-bold">{dummyGrades.length}</h4>
+                                            <h4 className="mb-0 fw-bold">{grades.length}</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -164,7 +202,7 @@ export default function PublicGrades() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {dummyGrades.map((grade, index) => {
+                                            {grades.map((grade, index) => {
                                                 const gradeInfo = getGradeStatus(grade.grade);
                                                 return (
                                                     <tr key={index}>
@@ -227,19 +265,19 @@ export default function PublicGrades() {
                                     <div className="col-md-3">
                                         <small className="text-muted">Nilai Tertinggi</small>
                                         <div className="fw-bold" style={{ color: '#2d5a41' }}>
-                                            {Math.max(...dummyGrades.map(g => g.grade))}
+                                        {Math.max(...grades.map(g => g.grade))}
                                         </div>
                                     </div>
                                     <div className="col-md-3">
                                         <small className="text-muted">Nilai Terendah</small>
                                         <div className="fw-bold" style={{ color: '#2d5a41' }}>
-                                            {Math.min(...dummyGrades.map(g => g.grade))}
+                                        {Math.min(...grades.map(g => g.grade))}
                                         </div>
                                     </div>
                                     <div className="col-md-3">
                                         <small className="text-muted">Total Nilai</small>
                                         <div className="fw-bold" style={{ color: '#2d5a41' }}>
-                                            {dummyGrades.reduce((sum, g) => sum + g.grade, 0)}
+                                            {grades.reduce((sum, g) => sum + g.grade, 0)}
                                         </div>
                                     </div>
                                     <div className="col-md-3">
