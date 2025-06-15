@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Validator;
 class MudarisController extends Controller
 {
     public function availableMudaris()
-{
-    $data =Mudaris::whereNull('user_id')->get(['id', 'name']);
+    {
+        $data = Mudaris::whereNull('user_id')->get(['id', 'name']);
 
-    return response()->json([
-        'success' => true,
-        'data' => $data
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
 
     public function index()
     {
@@ -131,7 +131,7 @@ class MudarisController extends Controller
 
         $data = [
             'name' => $request->name,
-            'gender' => $request->gender,
+            // 'gender' => $request->gender,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
         ];
