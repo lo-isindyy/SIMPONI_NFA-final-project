@@ -7,7 +7,11 @@ export const getClassroom = async () => {
 
 export const createClassroom = async (data) => {
   try {
-    const response = await API.post("/classrooms", data)
+    const response = await API.post("/classrooms", data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -27,7 +31,11 @@ export const showClassroom = async (id) => {
 
 export const updateClassroom = async (id, data) => {
   try {
-    const response = await API.post(`/classrooms/${id}`, data)
+    const response = await API.post(`/classrooms/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -37,7 +45,11 @@ export const updateClassroom = async (id, data) => {
 
 export const deleteClassroom = async (id) => {
   try {
-    await API.delete(`/classroom/${id}`)
+    await API.delete(`/classroom/${id}`,data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
   } catch (error) {
     console.log(error)
     throw error

@@ -7,7 +7,11 @@ export const getGrades = async () => {
 
 export const createGrade = async (data) => {
   try {
-    const response = await API.post("/grades", data)
+    const response = await API.post("/grades", datadata, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -27,7 +31,11 @@ export const showGrade = async (id) => {
 
 export const updateGrade = async (id, data) => {
   try {
-    const response = await API.post(`/grades/${id}`, data)
+    const response = await API.post(`/grades/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -37,7 +45,11 @@ export const updateGrade = async (id, data) => {
 
 export const deleteGrade = async (id) => {
   try {
-    await API.delete(`/grades/${id}`)
+    await API.delete(`/grades/${id}`,data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
   } catch (error) {
     console.log(error)
     throw error

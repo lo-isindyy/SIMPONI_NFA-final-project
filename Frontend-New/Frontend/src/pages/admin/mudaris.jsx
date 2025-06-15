@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {getMudaris, createMudaris, updateMudaris, deleteMudaris,} from "../../_services/mudaris"; // pastikan service ini sudah kamu buat
+import {getMudaris, createMudaris, updateMudaris, deleteMudaris,} from "../../_services/mudaris";
 import AdminLayout from "../../layouts/AdminLayout";
 
 const Mudaris = () => {

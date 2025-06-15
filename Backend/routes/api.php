@@ -27,19 +27,12 @@ Route::post('/register', [AuthController::class, 'register']);
 // login
 Route::post('/login', [AuthController::class, 'login']);
 
+
 //  ini bagian mudaris atau user
 route::middleware(['auth:api'])->group(function () {
-
-    // ini untuk lihat pembagian kamar
     Route::get('/dorm_asigments', [DormAssignmentController::class, 'indexSantri']);
-
-    //ini untuk melihat pembagian kelas atau jadwal
     Route::get('/grades', [GradeController::class, 'indexUser']);
-
-    // ini untuk profile
-    Route::apiResource('/santri', SantriController::class)->only('show', 'update');
-
-    // sisanya buat tampil saja
+    Route::apiResource('/santri', SantriController::class)->only('index','show', 'update');
     Route::apiResource('/classrooms', ClassroomController::class)->only('index');
     Route::apiResource('/dorms', DormController::class)->only('index');
     Route::apiResource('/subjects', SubjectController::class)->only('index');
@@ -48,15 +41,12 @@ route::middleware(['auth:api'])->group(function () {
     // ini bagian admin atau mudaris
     Route::middleware(['role:mudaris'])->group(function () {
 
-        //  ini untuk tambah mudaris
         Route::post('/register-mudaris', [AuthController::class, 'registerMudaris']);
-
-
         Route::apiResource('/dorm_asigments', DormAssignmentController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/grades', GradeController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/classrooms', ClassroomController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/dorms', DormController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/santri', SantriController::class)->only('index', 'store', 'delete');
+        Route::apiResource('/santri', SantriController::class)->only('store', 'delete', 'update' );
         Route::apiResource('/subjects', SubjectController::class)->only('show', 'store', 'update', 'delete');
         Route::apiResource('/mudaris', MudarisController::class)->only('show', 'store', 'update', 'delete');
     });

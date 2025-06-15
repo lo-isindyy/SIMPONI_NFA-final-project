@@ -7,7 +7,11 @@ export const getDorms = async () => {
 
 export const createDorm = async (data) => {
   try {
-    const response = await API.post("/dorms", data)
+    const response = await API.post("/dorms", data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -27,7 +31,11 @@ export const showDorm = async (id) => {
 
 export const updateDorm = async (id, data) => {
   try {
-    const response = await API.post(`/dorms/${id}`, data)
+    const response = await API.post(`/dorms/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -37,7 +45,11 @@ export const updateDorm = async (id, data) => {
 
 export const deleteDorm = async (id) => {
   try {
-    await API.delete(`/dorms/${id}`)
+    await API.delete(`/dorms/${id}`,data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
   } catch (error) {
     console.log(error)
     throw error

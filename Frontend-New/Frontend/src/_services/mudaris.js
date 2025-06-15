@@ -7,7 +7,11 @@ export const getMudaris = async () => {
 
 export const createMudaris = async (data) => {
   try {
-    const response = await API.post("/mudaris", data)
+    const response = await API.post("/mudaris", datadata, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -27,7 +31,11 @@ export const showMudaris = async (id) => {
 
 export const updateMudaris = async (id, data) => {
   try {
-    const response = await API.post(`/mudaris/${id}`, data)
+    const response = await API.post(`/mudaris/${id}`, datadata, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -37,7 +45,11 @@ export const updateMudaris = async (id, data) => {
 
 export const deleteMudaris = async (id) => {
   try {
-    await API.delete(`/mudaris/${id}`)
+    await API.delete(`/mudaris/${id}`,data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
   } catch (error) {
     console.log(error)
     throw error

@@ -7,7 +7,11 @@ export const getDormAssignments = async () => {
 
 export const createDormAssignment = async (data) => {
   try {
-    const response = await API.post("/dorm_asigments", data)
+    const response = await API.post("/dorm_asigments", data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -27,7 +31,11 @@ export const showDormAssignment = async (id) => {
 
 export const updateDormAssignment = async (id, data) => {
   try {
-    const response = await API.post(`/dorm_asigments/${id}`, data)
+    const response = await API.post(`/dorm_asigments/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.log(error)
@@ -37,7 +45,11 @@ export const updateDormAssignment = async (id, data) => {
 
 export const deleteDormAssignment = async (id) => {
   try {
-    await API.delete(`/dorm_asigments/${id}`)
+    await API.delete(`/dorm_asigments/${id}`,data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
   } catch (error) {
     console.log(error)
     throw error
