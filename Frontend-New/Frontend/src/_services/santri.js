@@ -7,7 +7,7 @@ export const getSantri = async () => {
 
 export const createSantri = async (data) => {
   try {
-    const response = await API.post("/santri", datadata, {
+    const response = await API.post("/santri", data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -31,7 +31,7 @@ export const showSantri = async (id) => {
 
 export const updateSantri = async (id, data) => {
   try {
-    const response = await API.post(`/santri/${id}`, datadata, {
+    const response = await API.post(`/santri/${id}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -45,7 +45,7 @@ export const updateSantri = async (id, data) => {
 
 export const deleteSantri = async (id) => {
   try {
-    await API.delete(`/santri/${id}`,data, {
+    await API.delete(`/santri/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

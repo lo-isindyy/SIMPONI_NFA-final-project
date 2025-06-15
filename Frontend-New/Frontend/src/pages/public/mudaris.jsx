@@ -1,70 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/header';
+import { getMudaris } from '../../_services/mudaris';
+import { imagesStorage } from '../../_api';
 
 export default function PublicMudaris() {
-    const [mudarisData] = useState([
-        {
-            id: 1, name: "Ust. Ahmad Fadli", email: "ahmad.fadli@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=21", 
-            bidang: "Fiqh"
-        },
-        {
-            id: 2, name: "Ust. Yusuf Maulana", email: "yusuf.maulana@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=22",
-            bidang: "Hadits"
-        },
-        {
-            id: 3, name: "Ust. Hanafi Ridwan", email: "hanafi.ridwan@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=23",
-            bidang: "Tafsir"
-        },
-        {
-            id: 4, name: "Ust. Salim Hidayat", email: "salim.hidayat@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=24",
-            bidang: "Akhlak"
-        },
-        {
-            id: 5, name: "Ust. Ridho Ramadhan", email: "ridho.ramadhan@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=25",
-            bidang: "Nahwu Sharaf"
-        },
-        {
-            id: 6, name: "Ust. Faisal Nurhadi", email: "faisal.nurhadi@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=26",
-            bidang: "Aqidah"
-        },
-        {
-            id: 7, name: "Ust. Zaki Wahyudi", email: "zaki.wahyudi@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=27",
-            bidang: "Sirah"
-        },
-        {
-            id: 8, name: "Ust. Burhan Majid", email: "burhan.majid@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=28",
-            bidang: "Mantiq"
-        },
-        {
-            id: 9, name: "Ust. Luthfi Rahmat", email: "luthfi.rahmat@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=29",
-            bidang: "Balaghah"
-        },
-        {
-            id: 10, name: "Ust. Hilmi Syarif", email: "hilmi.syarif@pesantren.ac.id", foto: "https://i.pravatar.cc/150?img=30",
-            bidang: "Ushul Fiqh"
+    const [mudaris, setMudaris] = useState([]);
+// const [loading, setLoading] = useState(true);
+
+useEffect(()=>{
+        const fetchData = async()=>{
+          const [mudarisData] = await Promise.all([
+            getMudaris(),
+          ])
+    
+          setMudaris(mudarisData)
+    
         }
-    ]);
+        fetchData()
+    
+      }, [])
+
+      console.log(mudaris);
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterBidang, setFilterBidang] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(8);
     const [isHovered, setIsHovered] = useState(false);
 
-    const filteredData = mudarisData.filter(mudaris => {
-        const matchesSearch = mudaris.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesBidang = filterBidang === '' || mudaris.bidang === filterBidang;
-        return matchesSearch && matchesBidang;
-    });
-
+const filteredData = mudaris.filter(mudaris => {
+    return mudaris.name.toLowerCase().includes(searchTerm.toLowerCase());
+});
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-    const getUniqueBidang = () => {
-        return [...new Set(mudarisData.map(mudaris => mudaris.bidang))];
-    };
 
     return (
         <>
@@ -98,7 +67,7 @@ export default function PublicMudaris() {
                                     </div>
                                     <div>
                                         <small className="text-muted fw-medium">Total Mudaris</small>
-                                        <h4 className="mb-0 fw-bold">{mudarisData.length}</h4>
+                                        <h4 className="mb-0 fw-bold">{mudaris.length}</h4>
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +78,7 @@ export default function PublicMudaris() {
                     <div className="card border-0 shadow-sm mb-5 mx-4">
                         <div className="card-body">
                             <div className="row">
-                                <div className="col-md-4 mb-3">
+                                <div className="col-md-6 mb-3">
                                     <label className="form-label fw-medium">Cari Mudaris</label>
                                     <div className="input-group">
                                         <span className="input-group-text"><i className="bi bi-search"></i></span>
@@ -123,17 +92,7 @@ export default function PublicMudaris() {
                                     </div>
                                 </div>
 
-                                <div className="col-md-4 mb-3">
-                                    <label className="form-label fw-medium">Bidang Keahlian (Mata Pelajaran)</label>
-                                    <select className="form-select" value={filterBidang} onChange={(e) => setFilterBidang(e.target.value)}>
-                                        <option value="">Semua Bidang</option>
-                                        {getUniqueBidang().map(bidang => (
-                                            <option key={bidang} value={bidang}>{bidang}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="col-md-4 mb-3 d-flex align-items-end">
+                                <div className="col-md-6 mb-3 d-flex align-items-end">
                                     <button
                                         className="btn btn-reset w-100"
                                         style={{
@@ -143,7 +102,6 @@ export default function PublicMudaris() {
                                         onMouseLeave={() => setIsHovered(false)}
                                         onClick={() => {
                                             setSearchTerm('');
-                                            setFilterBidang('');
                                             setCurrentPage(1);
                                         }}
                                     >
@@ -158,7 +116,7 @@ export default function PublicMudaris() {
                     {/* Header untuk Card Grid */}
                     <div className="mb-4 mx-4">
                         <h5 className="fw-bold">
-                            Daftar Mudaris ({filteredData.length} dari {mudarisData.length})
+                            Daftar Mudaris ({filteredData.length} dari {mudaris.length})
                         </h5>
                     </div>
 
@@ -169,7 +127,7 @@ export default function PublicMudaris() {
                                 <div className="col-md-6 col-lg-4 col-xl-3 mb-4" key={mudaris.id}>
                                     <div className="card border-0 shadow-sm h-100">
                                         <img
-                                            src={mudaris.foto}
+                                            src={`${imagesStorage}/mudaris/${mudaris.pp_mudaris}`}
                                             alt={mudaris.name}
                                             className="card-img-top"
                                             style={{ objectFit: 'cover', height: '200px' }}
@@ -177,11 +135,11 @@ export default function PublicMudaris() {
                                         <div className="card-body">
                                             <h5 className="card-title fw-bold">{mudaris.name}</h5>
                                             <p className="card-text text-muted mb-2">
-                                                <i className="bi bi-envelope-fill me-2"></i>{mudaris.email}
+                                                <i className="bi bi-telephone-fill me-2"></i>{mudaris.no_hp}
                                             </p>
                                             <p className="card-text mb-2">
                                                 <span className="badge rounded-pill" style={{ backgroundColor: '#D4A574', color: '#ffffff' }}>
-                                                    {mudaris.bidang}
+                                                    {mudaris.address || 'Tidak tersedia'}
                                                 </span>
                                             </p>
                                         </div>

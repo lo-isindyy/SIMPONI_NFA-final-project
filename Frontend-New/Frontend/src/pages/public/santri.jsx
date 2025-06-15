@@ -1,38 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/header';
+import { imagesStorage } from '../../_api';
+import { getSantri } from '../../_services/santri';
 
 export default function PublicSantri() {
-    const [santriData] = useState([
-        { id: 1, name: "Abdullah Rahman", tgl_lahir: "2006-09-30", jenjang: '2A', email: "abdullah@example.com", foto: "https://i.pravatar.cc/40?img=1" },
-        { id: 2, name: "Agung Wibowo", tgl_lahir: "2006-06-18", jenjang: '2B', email: "agung@example.com", foto: "https://i.pravatar.cc/40?img=2" },
-        { id: 3, name: "Ahmad Fauzi", tgl_lahir: "2007-03-15", jenjang: '1A', email: "ahmad@example.com", foto: "https://i.pravatar.cc/40?img=3" },
-        { id: 4, name: "Ali Imran", tgl_lahir: "2005-01-20", jenjang: '3B', email: "ali@example.com", foto: "https://i.pravatar.cc/40?img=4" },
-        { id: 5, name: "Bahtiar Habib", tgl_lahir: "2006-06-21", jenjang: '1C', email: "bahtiar@example.com", foto: "https://i.pravatar.cc/40?img=5" },
-        { id: 6, name: "Bilal Ibnu Rabah", tgl_lahir: "2006-06-10", jenjang: '2B', email: "bilal@example.com", foto: "https://i.pravatar.cc/40?img=6" },
-        { id: 7, name: "Fadel Tri Naba", tgl_lahir: "2006-07-19", jenjang: '2B', email: "fadel@example.com", foto: "https://i.pravatar.cc/40?img=7" },
-        { id: 8, name: "Fatur Rohman", tgl_lahir: "2007-09-30", jenjang: '1C', email: "fatur@example.com", foto: "https://i.pravatar.cc/40?img=8" },
-        { id: 9, name: "Hasan Al Basri", tgl_lahir: "2005-08-12", jenjang: '3C', email: "hasan@example.com", foto: "https://i.pravatar.cc/40?img=9" },
-        { id: 10, name: "Jalil Thoriq", tgl_lahir: "2005-11-03", jenjang: '3A', email: "jalil@example.com", foto: "https://i.pravatar.cc/40?img=10" },
-        { id: 11, name: "Khabib Gofur", tgl_lahir: "2005-10-20", jenjang: '2A', email: "khabib@example.com", foto: "https://i.pravatar.cc/40?img=11" },
-        { id: 12, name: "Kinan Varaby", tgl_lahir: "2005-12-21", jenjang: '3C', email: "kinan@example.com", foto: "https://i.pravatar.cc/40?img=12" },
-        { id: 13, name: "Muhammad Reiki", tgl_lahir: "2005-06-22", jenjang: '3B', email: "muhammad@example.com", foto: "https://i.pravatar.cc/40?img=13" },
-        { id: 14, name: "Muhammad Rizki", tgl_lahir: "2007-11-08", jenjang: '1B', email: "rizki@example.com", foto: "https://i.pravatar.cc/40?img=14" },
-        { id: 15, name: "Raian Handoko", tgl_lahir: "2007-02-14", jenjang: '1A', email: "raian@example.com", foto: "https://i.pravatar.cc/40?img=15" },
-        { id: 16, name: "Umar Faruq", tgl_lahir: "2006-12-03", jenjang: '2C', email: "umar@example.com", foto: "https://i.pravatar.cc/40?img=16" },
-        { id: 17, name: "Zaid bin Tsabit", tgl_lahir: "2007-03-05", jenjang: '1C', email: "zaid@example.com", foto: "https://i.pravatar.cc/40?img=17" },
-        { id: 18, name: "Zhafran Dimas", tgl_lahir: "2005-09-22", jenjang: '3B', email: "zhafran@example.com", foto: "https://i.pravatar.cc/40?img=18" },
-    ]);
+    const [santri,setSantri] = useState([]);
+
+    useEffect(()=>{
+            const fetchData = async()=>{
+              const [santriData] = await Promise.all([
+                getSantri(),
+              ])
+        
+              setSantri(santriData)
+        
+            }
+            fetchData()
+        
+          }, [])
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterJenjang, setFilterJenjang] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5);
     const [isHovered, setIsHovered] = useState(false);
 
-    const filteredData = santriData.filter(santri => {
+    const filteredData = santri.filter(santri => {
         const matchesSearch = santri.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesJenjang = filterJenjang === '' || santri.jenjang === filterJenjang;
-        return matchesSearch && matchesJenjang;
+        return matchesSearch
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -82,7 +76,7 @@ export default function PublicSantri() {
                     </div>
                     <div>
                         <small className="text-muted fw-medium">Total Santri</small>
-                        <h4 className="mb-0 fw-bold">{santriData.length}</h4>
+                        <h4 className="mb-0 fw-bold">{santri.length}</h4>
                     </div>
                     </div>
                 </div>
@@ -96,7 +90,7 @@ export default function PublicSantri() {
                     <div>
                         <small className="text-muted fw-medium">Rata-rata Umur</small>
                         <h4 className="mb-0 fw-bold">
-                        {Math.round(santriData.reduce((sum, s) => sum + calculateAge(s.tgl_lahir), 0) / santriData.length)} tahun
+                        {Math.round(santri.reduce((sum, s) => sum + calculateAge(s.tgl_lahir), 0) / santri.length)} tahun
                         </h4>
                     </div>
                     </div>
@@ -108,7 +102,7 @@ export default function PublicSantri() {
             <div className="card border-0 shadow-sm mb-5 mx-4">
                 <div className="card-body">
                 <div className="row">
-                    <div className="col-md-4 mb-3">
+                    <div className="col-md-6 mb-3">
                     <label className="form-label fw-medium">Cari Santri</label>
                     <div className="input-group">
                         <span className="input-group-text"><i className="bi bi-search"></i></span>
@@ -122,23 +116,7 @@ export default function PublicSantri() {
                     </div>
                     </div>
 
-                    <div className="col-md-4 mb-3">
-                    <label className="form-label fw-medium">Jenjang</label>
-                    <select className="form-select" value={filterJenjang} onChange={(e) => setFilterJenjang(e.target.value)}>
-                        <option value="">Semua</option>
-                        <option value="1A">1A</option>
-                        <option value="1B">1B</option>
-                        <option value="1C">1C</option>
-                        <option value="2A">2A</option>
-                        <option value="2B">2B</option>
-                        <option value="2C">2C</option>
-                        <option value="3A">3A</option>
-                        <option value="3B">3B</option>
-                        <option value="3C">3C</option>
-                    </select>
-                    </div>
-
-                    <div className="col-md-4 mb-3 d-flex align-items-end">
+                    <div className="col-md-6 mb-3 d-flex align-items-end">
                     <button
                         className="btn w-100"
                         style={{
@@ -151,7 +129,6 @@ export default function PublicSantri() {
                         onMouseLeave={() => setIsHovered(false)}
                         onClick={() => {
                         setSearchTerm('');
-                        setFilterJenjang('');
                         setCurrentPage(1);
                         }}
                     >
@@ -167,7 +144,7 @@ export default function PublicSantri() {
             <div className="card border-0 shadow-sm mb-5 mx-4">
                 <div className="card-header bg-white d-flex justify-content-between align-items-center">
                 <h5 className="mb-0 fw-bold">
-                    Daftar Santri ({filteredData.length} dari {santriData.length})
+                    Daftar Santri ({filteredData.length} dari {santri.length})
                 </h5>
                 </div>
                 <div className="card-body p-0">
@@ -190,7 +167,7 @@ export default function PublicSantri() {
                             <td>
                                 <div className="d-flex align-items-center">
                                 <img
-                                    src={santri.foto}
+                                    src={`${imagesStorage}/santri/${santri.pp_santri}`}
                                     alt={santri.name}
                                     className="rounded-circle me-3"
                                     style={{ width: '40px', height: '40px', objectFit: 'cover' }}
@@ -198,8 +175,8 @@ export default function PublicSantri() {
                                 <span className="fw-medium">{santri.name}</span>
                                 </div>
                             </td>
-                            <td>{santri.email}</td>
-                            <td>{santri.jenjang}</td>
+                            <td>{santri.address}</td>
+                            <td>{santri.no_hp}</td>
                             <td>{calculateAge(santri.tgl_lahir)} tahun</td>
                             </tr>
                         ))
