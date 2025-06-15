@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../_services/auth";
-import { getSantri } from "../../_services/santri";
+import { getSantriList } from "../../_services/santri";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function Register() {
   useEffect(() => {
     const fetchSantri = async () => {
       try {
-        const santriData = await getSantri();
+        const santriData = await getSantriList();
         setSantri(santriData);
       } catch (err) {
         console.error("Gagal mengambil data santri:", err);
@@ -40,24 +40,31 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     if (!form.santri_id) {
       alert("Pilih nama santri terlebih dahulu.");
       setLoading(false);
       return;
     }
-
+  
     try {
-      await register(form);
-      alert(`Santri berhasil register. Silakan login.`);
-      navigate("/login");
-    } catch (err) {
-      setError(err?.message || "Gagal melakukan registrasi.");
-    } finally {
-      setLoading(false);
-    }
+        console.log("Form Data:", form); // cek apa yang dikirim
+        const response = await register(form);
+        console.log("Register response:", response);
+        navigate("/login");
+      } catch (err) {
+        console.log("Register error raw:", err);
+      
+        if (err.response) {
+          console.log("Error response data:", err.response.data);
+          const messages = err.response.data.message || err.response.data.errors;
+          setError(JSON.stringify(messages));
+        } else {
+          setError("Terjadi kesalahan jaringan atau server tidak merespons.");
+        }
+      }
   };
-
+  
   return (
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center position-relative"

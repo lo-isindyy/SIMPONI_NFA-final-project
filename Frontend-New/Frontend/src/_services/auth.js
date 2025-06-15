@@ -30,9 +30,9 @@ export const logout = async ({ token }) => {
   }
 };
 
-export const register = async ({ name, email, password }) => {
+export const register = async ({ santri_id, email, password }) => {
   try {
-    const { data } = await API.post("/register", { name, email, password });
+    const { data } = await API.post("/register", { santri_id, email, password });
     return data;
   } catch (error) {
     throw error.response?.data || error;
