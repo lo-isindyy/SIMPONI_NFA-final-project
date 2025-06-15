@@ -45,7 +45,7 @@ export const updateClassroom = async (id, data) => {
 
 export const deleteClassroom = async (id) => {
   try {
-    await API.delete(`/classroom/${id}`,data, {
+    await API.delete(`/classrooms/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

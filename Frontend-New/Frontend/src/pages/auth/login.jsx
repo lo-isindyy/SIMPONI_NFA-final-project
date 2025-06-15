@@ -29,7 +29,14 @@ export default function Login() {
       localStorage.setItem("accessToken", response.token);
       localStorage.setItem("userInfo", JSON.stringify(response.user));
 
-      navigate(response.user.role === "mudaris" ? "/dashboard" : "/");
+      navigate(
+        response.user.role === "mudaris"
+          ? "/dashboard"
+          : response.user.role === "santri"
+          ? "/publicDashboard"
+          : "/"
+      );
+      
     } catch (err) {
       setError(err?.response?.data?.message || "Login gagal");
     } finally {
@@ -37,11 +44,17 @@ export default function Login() {
     }
   };
 
-  useEffect (() => {
+  useEffect(() => {
     if (token && decodeData && decodeData.success) {
-      navigate("/dashboard")
+      const role = decodeData.data.role;
+      if (role === "mudaris") {
+        navigate("/dashboard");
+      } else if (role === "santri") {
+        navigate("/publicDashboard");
+      }
     }
-  }, [token, decodeData, navigate])
+  }, [token, decodeData, navigate]);
+  
   
 
   return (

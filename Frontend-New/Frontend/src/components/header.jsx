@@ -35,19 +35,16 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      if (token) {
-        await logout({ token }); // optional: bisa kamu matikan sementara
-      }
+      await logout({ token });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userInfo");
-      setToken(null);
-      setUserInfo(null);
-      navigate("/login");
+      window.location.href = "/login"; // lebih cepat dan pasti
     }
   };
+  
 
   return (
     <header className="sticky-top bg-white w-100">

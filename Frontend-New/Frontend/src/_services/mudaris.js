@@ -7,7 +7,7 @@ export const getMudaris = async () => {
 
 export const createMudaris = async (data) => {
   try {
-    const response = await API.post("/mudaris", datadata, {
+    const response = await API.post("/mudaris", data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -31,7 +31,7 @@ export const showMudaris = async (id) => {
 
 export const updateMudaris = async (id, data) => {
   try {
-    const response = await API.post(`/mudaris/${id}`, datadata, {
+    const response = await API.post(`/mudaris/${id}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -45,7 +45,7 @@ export const updateMudaris = async (id, data) => {
 
 export const deleteMudaris = async (id) => {
   try {
-    await API.delete(`/mudaris/${id}`,data, {
+    await API.delete(`/mudaris/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

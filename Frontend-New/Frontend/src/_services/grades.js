@@ -7,7 +7,7 @@ export const getGrades = async () => {
 
 export const createGrade = async (data) => {
   try {
-    const response = await API.post("/grades", datadata, {
+    const response = await API.post("/grades", data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -45,7 +45,7 @@ export const updateGrade = async (id, data) => {
 
 export const deleteGrade = async (id) => {
   try {
-    await API.delete(`/grades/${id}`,data, {
+    await API.delete(`/grades/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

@@ -27,7 +27,6 @@ Route::post('/register', [AuthController::class, 'register']);
 // login
 Route::post('/login', [AuthController::class, 'login']);
 
-
 //  ini bagian mudaris atau user
 route::middleware(['auth:api'])->group(function () {
     Route::get('/dorm_asigments', [DormAssignmentController::class, 'indexSantri']);
@@ -37,17 +36,18 @@ route::middleware(['auth:api'])->group(function () {
     Route::apiResource('/dorms', DormController::class)->only('index');
     Route::apiResource('/subjects', SubjectController::class)->only('index');
     Route::apiResource('/mudaris', MudarisController::class)->only('index');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
     // ini bagian admin atau mudaris
     Route::middleware(['role:mudaris'])->group(function () {
 
         Route::post('/register-mudaris', [AuthController::class, 'registerMudaris']);
-        Route::apiResource('/dorm_asigments', DormAssignmentController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/grades', GradeController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/classrooms', ClassroomController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/dorms', DormController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/santri', SantriController::class)->only('store', 'delete', 'update' );
-        Route::apiResource('/subjects', SubjectController::class)->only('show', 'store', 'update', 'delete');
-        Route::apiResource('/mudaris', MudarisController::class)->only('show', 'store', 'update', 'delete');
+        Route::apiResource('/dorm_asigments', DormAssignmentController::class)->only('show', 'store', 'update', 'destroy');
+        Route::apiResource('/grades', GradeController::class)->only('show', 'store', 'update', 'destroy');
+        Route::apiResource('/classrooms', ClassroomController::class)->only('show', 'store', 'update', 'destroy');
+        Route::apiResource('/dorms', DormController::class)->only('show', 'store', 'update', 'destroy');
+        Route::apiResource('/santri', SantriController::class)->only('store', 'destroy', 'update' );
+        Route::apiResource('/subjects', SubjectController::class)->only('show', 'store', 'update', 'destroy');
+        Route::apiResource('/mudaris', MudarisController::class)->only('show', 'store', 'update', 'destroy');
     });
 });

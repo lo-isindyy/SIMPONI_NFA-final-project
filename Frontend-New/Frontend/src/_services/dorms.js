@@ -45,7 +45,7 @@ export const updateDorm = async (id, data) => {
 
 export const deleteDorm = async (id) => {
   try {
-    await API.delete(`/dorms/${id}`,data, {
+    await API.delete(`/dorms/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
