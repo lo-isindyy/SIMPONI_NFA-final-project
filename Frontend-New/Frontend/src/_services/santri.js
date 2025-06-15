@@ -31,7 +31,7 @@ export const showSantri = async (id) => {
 
 export const updateSantri = async (id, data) => {
   try {
-    const response = await API.put(`/santri/${id}`, data, {
+    const response = await API.post(`/santri/${id}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }

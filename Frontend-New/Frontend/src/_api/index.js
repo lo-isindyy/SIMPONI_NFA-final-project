@@ -17,3 +17,5 @@ API.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+export const imagesStorage = `${url}/storage`
