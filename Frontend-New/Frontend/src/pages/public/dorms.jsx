@@ -1,33 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/header';
+import { getDorms } from '../../_services/dorms';
 
 export default function PublicDorms() {
-    const [kamarData] = useState([
-        { id: 1, nama_kamar: "Ar-Rahman", capacity: 15, mudaris: "Ustadz Ahmad Fadli" },
-        { id: 2, nama_kamar: "Ar-Rahim", capacity: 12, mudaris: "Ustadz Muhammad Rizki" },
-        { id: 3, nama_kamar: "Al-Malik", capacity: 18, mudaris: "Ustadz Abdullah Rahman" },
-        { id: 4, nama_kamar: "Al-Quddus", capacity: 10, mudaris: "Ustadz Ali Hidayat" },
-        { id: 5, nama_kamar: "As-Salam", capacity: 16, mudaris: "Ustadz Junaidi Rahman" },
-        { id: 6, nama_kamar: "Al-Mu'min", capacity: 14, mudaris: "Ustadz Budi Santoso" },
-        { id: 7, nama_kamar: "Al-Muhaymin", capacity: 20, mudaris: "Ustadz Hilmi Syarif" },
-        { id: 8, nama_kamar: "Al-Aziz", capacity: 13, mudaris: "Ustadz Luthfi Rahmat" },
-        { id: 9, nama_kamar: "Al-Jabbar", capacity: 11, mudaris: "Ustadz Burhan Majid" },
-        { id: 10, nama_kamar: "Al-Mutakabbir", capacity: 17, mudaris: "Ustadz Zaki Wahyudi" },
-        { id: 11, nama_kamar: "Al-Khaliq", capacity: 19, mudaris: "Ustadz Faisal Nurhadi" },
-        { id: 12, nama_kamar: "Al-Bari", capacity: 8, mudaris: "Ustadz Ridho Ramadhan" },
-        { id: 13, nama_kamar: "Al-Musawwir", capacity: 15, mudaris: "Ustadz Salim Hidayat" },
-        { id: 14, nama_kamar: "Al-Ghaffar", capacity: 12, mudaris: "Ustadz Hanafi Ridwan" },
-        { id: 15, nama_kamar: "Al-Qahhar", capacity: 16, mudaris: "Ustadz Yusuf Maulana" }
-    ]);
-
+    const [kamarData, setKamarData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCapacity, setFilterCapacity] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
     const [isHovered, setIsHovered] = useState(false);
 
+    // Fetch data from API when component mounts
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await getDorms();
+                setKamarData(data);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching dorms data:', err);
+                setError('Gagal memuat data kamar. Silakan coba lagi.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const filteredData = kamarData.filter(kamar => {
-        const matchesSearch = kamar.nama_kamar.toLowerCase().includes(searchTerm.toLowerCase()) || kamar.mudaris.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = kamar.name.toLowerCase().includes(searchTerm.toLowerCase()) || (kamar.mudaris && kamar.mudaris.name.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesCapacity = filterCapacity === '' || (filterCapacity === 'small' && kamar.capacity <= 10) || (filterCapacity === 'medium' && kamar.capacity > 10 && kamar.capacity <= 15) || (filterCapacity === 'large' && kamar.capacity > 15);
         return matchesSearch && matchesCapacity;
     });
@@ -44,6 +49,56 @@ export default function PublicDorms() {
     };
 
     const totalCapacity = kamarData.reduce((sum, kamar) => sum + kamar.capacity, 0);
+
+    // Show loading spinner
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <div style={{ backgroundColor: 'rgb(239, 244, 252)' }} className="min-vh-100 py-4">
+                    <div className="container-fluid">
+                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
+                            <div className="text-center">
+                                <div className="spinner-border text-primary mb-3" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                <p className="text-muted">Memuat data kamar...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    // Show error message
+    if (error) {
+        return (
+            <>
+                <Header />
+                <div style={{ backgroundColor: 'rgb(239, 244, 252)' }} className="min-vh-100 py-4">
+                    <div className="container-fluid">
+                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
+                            <div className="text-center">
+                                <div className="alert alert-danger" role="alert">
+                                    <i className="bi bi-exclamation-triangle fs-4 mb-2 d-block"></i>
+                                    <h5>Terjadi Kesalahan</h5>
+                                    <p className="mb-3">{error}</p>
+                                    <button 
+                                        className="btn btn-primary" 
+                                        onClick={() => window.location.reload()}
+                                    >
+                                        <i className="bi bi-arrow-clockwise me-2"></i>
+                                        Muat Ulang
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -104,7 +159,7 @@ export default function PublicDorms() {
                                     <div>
                                         <small className="text-muted fw-medium">Rata-rata Kapasitas</small>
                                         <h4 className="mb-0 fw-bold">
-                                            {Math.round(totalCapacity / kamarData.length)}
+                                            {kamarData.length > 0 ? Math.round(totalCapacity / kamarData.length) : 0}
                                         </h4>
                                     </div>
                                 </div>
@@ -196,10 +251,10 @@ export default function PublicDorms() {
                                                                 <div className="p-2 rounded me-3" style={{ backgroundColor: '#F5F5F5' }}>
                                                                     <i className="bi bi-house-door" style={{ color: '#D4A574', fontSize: '1.25rem' }}></i>
                                                                 </div>
-                                                                <span className="fw-medium">{kamar.nama_kamar}</span>
+                                                                <span className="fw-medium">{kamar.name}</span>
                                                             </div>
                                                         </td>
-                                                        <td>{kamar.mudaris}</td>
+                                                        <td>{kamar.mudaris ? kamar.mudaris.name : 'Belum ditentukan'}</td>
                                                         <td>
                                                             <span className="fw-medium">{kamar.capacity} orang</span>
                                                         </td>

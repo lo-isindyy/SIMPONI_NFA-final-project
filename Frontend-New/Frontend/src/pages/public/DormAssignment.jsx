@@ -1,32 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/header';
+import { getDormAssignments } from '../../_services/dormAssignment';
 
 export default function PublicDormAssignment() {
-    const [assignments] = useState([
-        { id: 1, santri: "Abdullah Rahman", kamar: "Ar-Rahman" },
-        { id: 2, santri: "Agung Wibowo", kamar: "Ar-Rahim" },
-        { id: 3, santri: "Ahmad Fauzi", kamar: "Al-Malik" },
-        { id: 4, santri: "Ali Imran", kamar: "Al-Quddus" },
-        { id: 5, santri: "Bahtiar Habib", kamar: "As-Salam" },
-        { id: 6, santri: "Bilal Ibnu Rabah", kamar: "Al-Mu'min" },
-        { id: 7, santri: "Fadel Tri Naba", kamar: "Al-Muhaymin" },
-        { id: 8, santri: "Fatur Rohman", kamar: "Al-Aziz" },
-        { id: 9, santri: "Hasan Al Basri", kamar: "Al-Jabbar" },
-        { id: 10, santri: "Jalil Thoriq", kamar: "Al-Mutakabbir" },
-        { id: 11, santri: "Khabib Gofur", kamar: "Al-Khaliq" },
-        { id: 12, santri: "Kinan Varaby", kamar: "Al-Bari" },
-        { id: 13, santri: "Muhammad Reiki", kamar: "Al-Musawwir" },
-        { id: 14, santri: "Muhammad Rizki", kamar: "Al-Ghaffar" },
-        { id: 15, santri: "Raian Handoko", kamar: "Al-Qahhar" },
-        { id: 16, santri: "Umar Faruq", kamar: "Ar-Rahman" },
-        { id: 17, santri: "Zaid bin Tsabit", kamar: "Ar-Rahim" },
-        { id: 18, santri: "Zhafran Dimas", kamar: "Al-Malik" }
-    ]);
-
+    const [assignments, setAssignments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
     const [isHovered, setIsHovered] = useState(false);
+
+    // Fetch data dari API saat component dimount
+    useEffect(() => {
+        const fetchAssignments = async () => {
+            try {
+                setLoading(true);
+                const data = await getDormAssignments();
+                
+                // Transform data sesuai format yang dibutuhkan component
+                const transformedData = data.map(item => ({
+                    id: item.id,
+                    santri: item.santri?.name || 'Unknown Santri',
+                    kamar: item.dorm?.name || 'Unknown Dorm'
+                }));
+                
+                setAssignments(transformedData);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching dorm assignments:', err);
+                setError('Gagal memuat data pembagian kamar');
+                setAssignments([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAssignments();
+    }, []);
 
     const filteredAssignments = assignments.filter(item =>
         item.santri.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -41,6 +52,53 @@ export default function PublicDormAssignment() {
     // Menghitung statistik kamar yang terisi
     const uniqueRooms = [...new Set(assignments.map(item => item.kamar))];
     const totalAssignedRooms = uniqueRooms.length;
+
+    // Function untuk refresh data
+    const handleRefresh = async () => {
+        try {
+            setLoading(true);
+            const data = await getDormAssignments();
+            
+            const transformedData = data.map(item => ({
+                id: item.id,
+                santri: item.santri?.name || 'Unknown Santri',
+                kamar: item.dorm?.name || 'Unknown Dorm'
+            }));
+            
+            setAssignments(transformedData);
+            setSearchTerm('');
+            setCurrentPage(1);
+            setError(null);
+        } catch (err) {
+            console.error('Error refreshing data:', err);
+            setError('Gagal memuat ulang data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet" />
+                
+                <div style={{ backgroundColor: 'rgb(239, 244, 252)' }} className="min-vh-100 py-4">
+                    <div className="container-fluid">
+                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '50vh' }}>
+                            <div className="text-center">
+                                <div className="spinner-border text-primary mb-3" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                <p className="text-muted">Memuat data pembagian kamar...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -63,6 +121,22 @@ export default function PublicDormAssignment() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Error Alert */}
+                    {error && (
+                        <div className="alert alert-danger mx-4 mb-4" role="alert">
+                            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                            {error}
+                            <button 
+                                type="button" 
+                                className="btn btn-sm btn-outline-danger ms-3"
+                                onClick={handleRefresh}
+                            >
+                                <i className="bi bi-arrow-clockwise me-1"></i>
+                                Coba Lagi
+                            </button>
+                        </div>
+                    )}
 
                     {/* Stats */}
                     <div className="row mb-4 mx-2">
@@ -129,6 +203,7 @@ export default function PublicDormAssignment() {
                                             setSearchTerm('');
                                             setCurrentPage(1);
                                         }}
+                                        disabled={loading}
                                     >
                                         <i className="bi bi-arrow-clockwise me-2"></i>
                                         Reset
@@ -144,6 +219,14 @@ export default function PublicDormAssignment() {
                             <h5 className="mb-0 fw-bold">
                                 Daftar Pembagian Kamar ({filteredAssignments.length} dari {assignments.length})
                             </h5>
+                            <button 
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={handleRefresh}
+                                disabled={loading}
+                            >
+                                <i className="bi bi-arrow-clockwise me-1"></i>
+                                Refresh
+                            </button>
                         </div>
                         <div className="card-body p-0">
                             <div className="table-responsive">
