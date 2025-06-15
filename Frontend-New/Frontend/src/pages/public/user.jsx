@@ -12,12 +12,12 @@ export default function User() {
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false); // State untuk mengontrol tampilan password
 
-  useEffect(() => {
-    if (!token || !success) {
-      localStorage.removeItem("accessToken");
-      navigate("/login");
-      return;
-    }
+    useEffect(() => {
+        if (!token || !success) {
+        localStorage.removeItem("accessToken");
+        navigate("/login");
+        return;
+        }
 
     const stored = localStorage.getItem("userProfile");
     const parsed = stored ? JSON.parse(stored) : null;
