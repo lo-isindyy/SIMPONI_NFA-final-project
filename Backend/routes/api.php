@@ -32,7 +32,7 @@ Route::post('/login', [AuthController::class, 'login']);
 route::middleware(['auth:api'])->group(function () {
     Route::get('/dorm_asigments', [DormAssignmentController::class, 'indexSantri']);
     Route::get('/grades', [GradeController::class, 'indexUser']);
-    Route::apiResource('/santri', SantriController::class)->only('index','show', 'update');
+    Route::apiResource('/santri', SantriController::class)->only('index','show');
     Route::apiResource('/classrooms', ClassroomController::class)->only('index');
     Route::apiResource('/dorms', DormController::class)->only('index');
     Route::apiResource('/subjects', SubjectController::class)->only('index');

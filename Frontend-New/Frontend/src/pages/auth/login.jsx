@@ -29,7 +29,7 @@ export default function Login() {
       localStorage.setItem("accessToken", response.token);
       localStorage.setItem("userInfo", JSON.stringify(response.user));
 
-      navigate(response.user.role === "admin" ? "/admin" : "/");
+      navigate(response.user.role === "mudaris" ? "/dashboard" : "/");
     } catch (err) {
       setError(err?.response?.data?.message || "Login gagal");
     } finally {
@@ -37,16 +37,11 @@ export default function Login() {
     }
   };
 
-  useEffect(() => {
-    if (
-      token &&
-      decodeData &&
-      decodeData.success &&
-      decodeData.data?.role
-    ) {
-      navigate(decodeData.data.role === "admin" ? "/admin" : "/");
+  useEffect (() => {
+    if (token && decodeData && decodeData.success) {
+      navigate("/dashboard")
     }
-  }, [token, decodeData, navigate]);
+  }, [token, decodeData, navigate])
   
 
   return (

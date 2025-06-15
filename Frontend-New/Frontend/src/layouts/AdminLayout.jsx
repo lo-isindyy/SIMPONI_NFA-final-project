@@ -1,127 +1,147 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdDashboard } from 'react-icons/md';
 import {
-    FaUserGraduate,
-    FaUserTie,
-    FaChalkboardTeacher,
-    FaBookOpen,
-    FaStar,
-    FaBuilding,
-    FaUserCog,
-    FaSignOutAlt,
-    } from 'react-icons/fa';
-    import { IoMdMenu, IoMdClose } from 'react-icons/io';
+  FaUserGraduate,
+  FaUserTie,
+  FaChalkboardTeacher,
+  FaBookOpen,
+  FaStar,
+  FaBuilding,
+  FaUserCog,
+  FaSignOutAlt,
+} from 'react-icons/fa';
+import { IoMdMenu, IoMdClose } from 'react-icons/io';
+import { logout, useDecodeToken } from "../_services/auth";
 
-    const AdminLayout = ({ children, currentPage }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const AdminLayout = ({ children, currentPage }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
 
-    return (
-        <div className="app-layout" style={{ display: 'flex' }}>
-        <Sidebar
-            currentPage={currentPage}
-            isOpen={isSidebarOpen}
-            setIsOpen={setIsSidebarOpen}
-        />
-        <main
-            style={{
-            marginLeft: isSidebarOpen ? '250px' : '70px',
-            padding: '20px',
-            width: isSidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
-            transition: 'margin-left 0.3s ease',
-            }}
-        >
-            {children}
-        </main>
-        </div>
-    );
-    };
+  const token = localStorage.getItem("accessToken");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const decodeData = useDecodeToken(token);
 
-    const Sidebar = ({ currentPage, isOpen, setIsOpen }) => {
-    const navigate = useNavigate();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+  useEffect(() => {
+    if (!token || !decodeData || !decodeData.success) {
+      navigate("/login");
+    }
 
-    const toggleSidebar = () => setIsOpen(!isOpen);
+    const role = userInfo?.role;
+    if (role !== "mudaris") {
+      navigate("/");
+    }
+  }, [token, decodeData, navigate]);
 
-    const menuItems = [
-        { label: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
-        { label: 'Data Santri', icon: <FaUserGraduate />, path: '/santri' },
-        { label: 'Data Mudaris', icon: <FaUserTie />, path: '/ustadz' },
-        { label: 'Data Ruang Kelas', icon: <FaChalkboardTeacher />, path: '/ruang-kelas' },
-        { label: 'Data Mata Pelajaran', icon: <FaBookOpen />, path: '/jadwal' },
-        { label: 'Nilai', icon: <FaStar />, path: '/nilai' },
-        { label: 'Data Asrama', icon: <FaBuilding />, dropdown: true },
-        { label: 'User', icon: <FaUserCog />, path: '/login' },
-    ];
+  return (
+    <div className="app-layout" style={{ display: 'flex' }}>
+      <Sidebar
+        currentPage={currentPage}
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
+      />
+      <main
+        style={{
+          marginLeft: isSidebarOpen ? '250px' : '70px',
+          padding: '20px',
+          width: isSidebarOpen ? 'calc(100% - 250px)' : 'calc(100% - 70px)',
+          transition: 'margin-left 0.3s ease',
+        }}
+      >
+        {children}
+      </main>
+    </div>
+  );
+};
 
-    const handleNavigate = (path) => navigate(path);
+const Sidebar = ({ currentPage, isOpen, setIsOpen }) => {
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const handleLogout = () => {
-        if (window.confirm('Yakin ingin logout?')) {
-        navigate('/login');
-        }
-    };
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
-    return (
-        <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
-        <div className="top">
-            <button className="toggle-btn" onClick={toggleSidebar}>
-            {isOpen ? <IoMdClose size={24} /> : <IoMdMenu size={24} />}
-            </button>
-            {isOpen && <h2>SIMPONI</h2>}
-        </div>
+  const handleLogout = async () => {
+    if (window.confirm('Yakin ingin logout?')) {
+      await logout(); // jika logout() tidak ada, cukup hapus baris ini
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userInfo");
+      navigate("/login");
+    }
+  };
 
-        <div className="menu">
-            {menuItems.map((item, idx) => (
-            <div key={idx}>
-                {!item.dropdown ? (
+  const menuItems = [
+    { label: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
+    { label: 'Data Santri', icon: <FaUserGraduate />, path: '/santri' },
+    { label: 'Data Mudaris', icon: <FaUserTie />, path: '/ustadz' },
+    { label: 'Data Ruang Kelas', icon: <FaChalkboardTeacher />, path: '/ruang-kelas' },
+    { label: 'Data Mata Pelajaran', icon: <FaBookOpen />, path: '/jadwal' },
+    { label: 'Nilai', icon: <FaStar />, path: '/nilai' },
+    { label: 'Data Asrama', icon: <FaBuilding />, dropdown: true },
+    { label: 'User', icon: <FaUserCog />, path: '/login' },
+  ];
+
+  const handleNavigate = (path) => navigate(path);
+
+  return (
+    <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+      <div className="top">
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          {isOpen ? <IoMdClose size={24} /> : <IoMdMenu size={24} />}
+        </button>
+        {isOpen && <h2>SIMPONI</h2>}
+      </div>
+
+      <div className="menu">
+        {menuItems.map((item, idx) => (
+          <div key={idx}>
+            {!item.dropdown ? (
+              <button
+                className={`menu-item ${currentPage === item.path ? 'active' : ''}`}
+                onClick={() => handleNavigate(item.path)}
+              >
+                {item.icon}
+                {isOpen && <span>{item.label}</span>}
+              </button>
+            ) : (
+              <>
                 <button
-                    className={`menu-item ${currentPage === item.path ? 'active' : ''}`}
-                    onClick={() => handleNavigate(item.path)}
+                  className="menu-item"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
-                    {item.icon}
-                    {isOpen && <span>{item.label}</span>}
+                  {item.icon}
+                  {isOpen && <span>{item.label}</span>}
+                  {isOpen && (
+                    <span className={`arrow ${dropdownOpen ? 'open' : ''}`}>▶</span>
+                  )}
                 </button>
-                ) : (
-                <>
+                {dropdownOpen && isOpen && (
+                  <div className="dropdown">
                     <button
-                    className="menu-item"
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                      onClick={() => handleNavigate('/asrama')}
+                      className={currentPage === '/asrama' ? 'active' : ''}
                     >
-                    {item.icon}
-                    {isOpen && <span>{item.label}</span>}
-                    {isOpen && (
-                        <span className={`arrow ${dropdownOpen ? 'open' : ''}`}>▶</span>
-                    )}
+                      Kamar
                     </button>
-                    {dropdownOpen && isOpen && (
-                    <div className="dropdown">
-                        <button
-                        onClick={() => handleNavigate('/asrama')}
-                        className={currentPage === '/asrama' ? 'active' : ''}
-                        >
-                        Kamar
-                        </button>
-                        <button
-                        onClick={() => handleNavigate('/pembagian-kamar')}
-                        className={currentPage === '/pembagian-kamar' ? 'active' : ''}
-                        >
-                        Pembagian Kamar
-                        </button>
-                    </div>
-                    )}
-                </>
+                    <button
+                      onClick={() => handleNavigate('/pembagian-kamar')}
+                      className={currentPage === '/pembagian-kamar' ? 'active' : ''}
+                    >
+                      Pembagian Kamar
+                    </button>
+                  </div>
                 )}
-            </div>
-            ))}
-        </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
 
-        <div className="logout">
-            <button className="menu-item" onClick={handleLogout}>
-            <FaSignOutAlt />
-            {isOpen && <span>Logout</span>}
-            </button>
-        </div>
+      <div className="logout">
+        <button className="menu-item" onClick={handleLogout}>
+          <FaSignOutAlt />
+          {isOpen && <span>Logout</span>}
+        </button>
+      </div>
 
         <style jsx>{`
             .sidebar {
