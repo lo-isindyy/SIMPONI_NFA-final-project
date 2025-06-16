@@ -58,12 +58,6 @@ export default function User() {
               </div>
 
               <div className="card-body p-5">
-                {/* Profile Image Section */}
-                <div className="text-center mb-4">
-                  <div className="position-relative d-inline-block">
-                    <img src={userProfile.profileImage} alt="Profile" className="rounded-circle shadow-lg" style={{ width: '150px', height: '150px', objectFit: 'cover', border: '4px solid #BCAAA4' }} />
-                  </div>
-                </div>
 
                 {/* Profile Information */}
                 <div className="row">
