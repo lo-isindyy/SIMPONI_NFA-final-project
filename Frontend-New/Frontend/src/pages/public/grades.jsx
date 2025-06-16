@@ -6,7 +6,9 @@ export default function PublicGrades() {
     const [grades, setGrades] = useState([]);
     const [showGrades, setShowGrades] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const santriName = "Abdullah Rahman"; // nama santri contoh
+    const santriName = grades
+  .map((grade) => ` ${grade.santri?.name || "ustadz"}`)
+  .join(", ");
     useEffect(()=>{
                 const fetchData = async()=>{
                   const [gradeData] = await Promise.all([
