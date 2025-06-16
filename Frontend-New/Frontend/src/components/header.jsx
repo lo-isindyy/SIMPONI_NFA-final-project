@@ -1,10 +1,10 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { logout } from "../_services/auth";
 
 export default function Header() {
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [token, setToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);

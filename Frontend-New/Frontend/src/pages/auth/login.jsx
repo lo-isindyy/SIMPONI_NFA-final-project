@@ -23,21 +23,25 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-  
+
     try {
       const response = await login(formData);
       localStorage.setItem("accessToken", response.token);
-  
-      const userWithPassword = { ...response.user, password: formData.password };
+      localStorage.setItem("userInfo", JSON.stringify(response.user));
+
+      const userWithPassword = {
+        ...response.user,
+        password: formData.password,
+      };
       localStorage.setItem("userProfile", JSON.stringify(userWithPassword));
-  
-      if (response.user.role === "mudaris") {
-        navigate("/dashboard");
-      } else if (response.user.role === "santri") {
-        navigate("/publicDashboard");
-      } else {
-        navigate("/");
-      }      
+
+      navigate(
+        response.user.role === "mudaris"
+          ? "/dashboard"
+          : response.user.role === "santri"
+          ? "/publicDashboard"
+          : "/"
+      );
     } catch (err) {
       setError(err?.response?.data?.message || "Login gagal");
     } finally {
@@ -55,7 +59,7 @@ export default function Login() {
       }
     }
   }, [token, decodeData, navigate]);
-  
+
 
   return (
     <div className="min-vh-100 d-flex justify-content-center align-items-center position-relative" style={{

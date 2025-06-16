@@ -40,31 +40,31 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-  
+
     if (!form.santri_id) {
       alert("Pilih nama santri terlebih dahulu.");
       setLoading(false);
       return;
     }
-  
+
     try {
-        console.log("Form Data:", form); // cek apa yang dikirim
-        const response = await register(form);
-        console.log("Register response:", response);
-        navigate("/login");
-      } catch (err) {
-        console.log("Register error raw:", err);
-      
-        if (err.response) {
-          console.log("Error response data:", err.response.data);
-          const messages = err.response.data.message || err.response.data.errors;
-          setError(JSON.stringify(messages));
-        } else {
-          setError("Terjadi kesalahan jaringan atau server tidak merespons.");
-        }
+      console.log("Form Data:", form); // cek apa yang dikirim
+      const response = await register(form);
+      console.log("Register response:", response);
+      navigate("/login");
+    } catch (err) {
+      console.log("Register error raw:", err);
+
+      if (err.response) {
+        console.log("Error response data:", err.response.data);
+        const messages = err.response.data.message || err.response.data.errors;
+        setError(JSON.stringify(messages));
+      } else {
+        setError("Terjadi kesalahan jaringan atau server tidak merespons.");
       }
+    }
   };
-  
+
   return (
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center position-relative"
@@ -119,7 +119,10 @@ export default function Register() {
               }}
             />
           </div>
-          <h1 className="fw-bold mb-0" style={{ fontSize: "2rem", color: "#0000CD" }}>
+          <h1
+            className="fw-bold mb-0"
+            style={{ fontSize: "2rem", color: "#0000CD" }}
+          >
             SIMPONI
           </h1>
           <p className="text-muted" style={{ fontSize: "0.85rem" }}>
@@ -136,14 +139,21 @@ export default function Register() {
               value={form.santri_id}
               onChange={handleChange}
               required
+              disabled={santri.length === 0} // Disable dropdown jika kosong
               style={{ borderRadius: "8px" }}
             >
-              <option value="">Pilih Nama Santri</option>
-              {santri.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
+              {santri.length === 0 ? (
+                <option value="">Semua santri sudah registrasi</option>
+              ) : (
+                <>
+                  <option value="">Pilih Nama Santri</option>
+                  {santri.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
 
