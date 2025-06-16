@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/header';
+import { MudarisImageStorage } from '../../_api';
 import { getMudaris } from '../../_services/mudaris';
-import { imagesStorage } from '../../_api';
 
 export default function PublicMudaris() {
     const [mudaris, setMudaris] = useState([]);
@@ -127,7 +127,7 @@ const filteredData = mudaris.filter(mudaris => {
                                 <div className="col-md-6 col-lg-4 col-xl-3 mb-4" key={mudaris.id}>
                                     <div className="card border-0 shadow-sm h-100">
                                         <img
-                                            src={`${imagesStorage}/mudaris/${mudaris.pp_mudaris}`}
+                                            src={`${MudarisImageStorage}/${mudaris.pp_mudaris}`}
                                             alt={mudaris.name}
                                             className="card-img-top"
                                             style={{ objectFit: 'cover', height: '200px' }}

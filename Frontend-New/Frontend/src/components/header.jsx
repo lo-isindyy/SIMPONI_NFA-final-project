@@ -13,7 +13,7 @@ export default function Header() {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
-    const storedUser = localStorage.getItem("userInfo");
+    const storedUser = localStorage.getItem("userProfile");
     setToken(storedToken);
     setUserInfo(storedUser ? JSON.parse(storedUser) : null);
   }, [location]); // update saat route berubah

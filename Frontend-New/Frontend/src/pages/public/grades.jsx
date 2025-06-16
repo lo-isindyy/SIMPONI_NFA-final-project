@@ -1,78 +1,42 @@
-import { useEffect, useState } from "react";
-import { getGrades } from "../../_services/grades";
-import { useDecodeToken } from "../../_services/auth";
-import Header from "../../components/Header";
+import React, { useEffect, useState } from 'react';
+import { getGrades } from '../../_services/grades';
+import Header from '../../components/header';
 
 export default function PublicGrades() {
     const [grades, setGrades] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [showGrades, setShowGrades] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const [santriName, setSantriName] = useState("");
-  
-    const token = localStorage.getItem("accessToken");
-    const { success, data: tokenData } = useDecodeToken(token); // ✅ Panggil di sini saja
-  
-    useEffect(() => {
-      const fetchGrades = async () => {
-        try {
-          const allGrades = await getGrades();
-          console.log("Semua nilai dari API:", allGrades);
-  
-          // ❌ Hapus pemanggilan useDecodeToken di sini
-          console.log("Data token setelah decode:", tokenData);
-  
-          if (success && tokenData?.santri_id) {
-            const filtered = allGrades.filter(
-              (g) => g.santri_id === tokenData.santri_id
-            );
-            console.log("Nilai setelah filter:", filtered);
-            setGrades(filtered);
-  
-            // Jika ingin tampilkan nama santri:
-            setSantriName(filtered[0]?.santri?.name || ""); // ✅ ini aman jika ada relasi
-          } else {
-            setGrades([]);
-            setSantriName("");
-          }
-        } catch (error) {
-          console.error("Gagal ambil nilai:", error);
-          setGrades([]);
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchGrades();
-    }, [success, tokenData]); // ✅ dependensi cukup ini
-  
-  const handleShowGrades = () => {
-    setShowGrades(true);
-    if (tokenData?.nama) {
-      setSantriName(tokenData.nama);
-    }
-  };
-
-  const resetView = () => {
-    setShowGrades(false);
-    setSantriName("");
-    setIsHovered(false);
-  };
-
-  const calculateAverage = () => {
-    const total = grades.reduce((sum, g) => sum + g.grade, 0);
-    return grades.length > 0 ? Math.round(total / grades.length) : 0;
-  };
-
-  const getGradeStatus = (grade) => {
-    if (grade >= 85) return { status: "Sangat Baik", color: "#28a745" };
-    if (grade >= 75) return { status: "Baik", color: "#17a2b8" };
-    if (grade >= 65) return { status: "Cukup", color: "#ffc107" };
-    return { status: "Perlu Perbaikan", color: "#dc3545" };
-  };
-
-  if (loading) return <p>Loading...</p>;
-
+    const santriName = grades
+  .map((grade) => ` ${grade.santri?.name || "ustadz"}`)
+  .join(", ");
+    useEffect(()=>{
+                const fetchData = async()=>{
+                  const [gradeData] = await Promise.all([
+                    getGrades(),
+                  ])
+            
+                  setGrades(gradeData)
+            
+                }
+                fetchData()
+            
+              }, [])
+    const handleShowGrades = () => {
+        setShowGrades(true);
+    };
+    const calculateAverage = () => {
+        const total = grades.reduce((sum, grade) => sum + grade.grade, 0);
+        return Math.round(total / grades.length);
+    };
+    const getGradeStatus = (grade) => {
+        if (grade >= 85) return { status: 'Sangat Baik', color: '#28a745' };
+        if (grade >= 75) return { status: 'Baik', color: '#17a2b8' };
+        if (grade >= 65) return { status: 'Cukup', color: '#ffc107' };
+        return { status: 'Perlu Perbaikan', color: '#dc3545' };
+    };
+    const resetView = () => {
+        setShowGrades(false);
+    };
     return (
         <>
         <Header />
@@ -84,7 +48,6 @@ export default function PublicGrades() {
                 href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
                 rel="stylesheet"
             />
-
             <div style={{ backgroundColor: 'rgb(239, 244, 252)' }} className="min-vh-100 py-4">
                 <div className="container-fluid">
 
@@ -132,9 +95,7 @@ export default function PublicGrades() {
                             </div>
                         </div>
                     )}
-
-                    {/* Action Buttons */}
-                    <div className="card border-0 shadow-sm mb-5 mx-4">
+{/* Action Buttons */}<div className="card border-0 shadow-sm mb-5 mx-4">
                         <div className="card-body">
                             <div className="row">
                                 <div className="col-md-6 mb-3">
@@ -147,12 +108,10 @@ export default function PublicGrades() {
                                                 color: '#2d5a41',
                                                 border: 'none'
                                             }}
-                                            onClick={handleShowGrades}
-                                        >
+                                            onClick={handleShowGrades}>
                                             <i className="bi bi-eye me-2"></i>
                                             Tampilkan Nilai saya
                                         </button>
-                                        
                                         {showGrades && (
                                             <button
                                                 className="btn btn-reset"
@@ -164,8 +123,7 @@ export default function PublicGrades() {
                                                 }}
                                                 onMouseEnter={() => setIsHovered(true)}
                                                 onMouseLeave={() => setIsHovered(false)}
-                                                onClick={resetView}
-                                            >
+                                                onClick={resetView}>
                                                 <i className="bi bi-arrow-clockwise me-2"></i>
                                                 Reset
                                             </button>
@@ -175,7 +133,6 @@ export default function PublicGrades() {
                             </div>
                         </div>
                     </div>
-
                     {/* Student Info & Grades Table */}
                     {showGrades && (
                         <div className="card border-0 shadow-sm mb-5 mx-4">
@@ -202,17 +159,17 @@ export default function PublicGrades() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {grades.map((grade, index) => {
+                                            {grades.map((grade,index) => {
                                                 const gradeInfo = getGradeStatus(grade.grade);
                                                 return (
-                                                    <tr key={index}>
+                                                    <tr key={grade.id}>
                                                         <td className="fw-medium">{index + 1}</td>
                                                         <td>
                                                             <div className="d-flex align-items-center">
                                                                 <div className="p-2 rounded me-3" style={{ backgroundColor: '#E8F5E8' }}>
                                                                     <i className="bi bi-book-half fs-6" style={{ color: '#2d5a41' }}></i>
                                                                 </div>
-                                                                <span className="fw-medium">{grade.subject}</span>
+                                                                <span className="fw-medium">{grade.subject?.name || '-'}</span>
                                                             </div>
                                                         </td>
                                                         <td>
@@ -230,8 +187,7 @@ export default function PublicGrades() {
                                                                     backgroundColor: gradeInfo.color + '20',
                                                                     color: gradeInfo.color,
                                                                     border: `1px solid ${gradeInfo.color}40`
-                                                                }}
-                                                            >
+                                                                }}>
                                                                 {gradeInfo.status}
                                                             </span>
                                                         </td>
@@ -258,20 +214,19 @@ export default function PublicGrades() {
                                     </table>
                                 </div>
                             </div>
-                            
                             {/* Summary Footer */}
                             <div className="card-footer bg-light">
                                 <div className="row text-center">
                                     <div className="col-md-3">
                                         <small className="text-muted">Nilai Tertinggi</small>
                                         <div className="fw-bold" style={{ color: '#2d5a41' }}>
-                                        {Math.max(...grades.map(g => g.grade))}
+                                            {Math.max(...grades.map(g => g.grade))}
                                         </div>
                                     </div>
                                     <div className="col-md-3">
                                         <small className="text-muted">Nilai Terendah</small>
                                         <div className="fw-bold" style={{ color: '#2d5a41' }}>
-                                        {Math.min(...grades.map(g => g.grade))}
+                                            {Math.min(...grades.map(g => g.grade))}
                                         </div>
                                     </div>
                                     <div className="col-md-3">
@@ -290,7 +245,6 @@ export default function PublicGrades() {
                             </div>
                         </div>
                     )}
-
                     {/* Welcome Card (when grades not shown) */}
                     {!showGrades && (
                         <div className="card border-0 shadow-sm mb-5 mx-4">
@@ -313,7 +267,6 @@ export default function PublicGrades() {
                             </div>
                         </div>
                     )}
-
                 </div>
             </div>
         </>

@@ -18,4 +18,5 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const imagesStorage = `${url}/storage`
+export const SantriImageStorage = `${url}/storage/santri`
+export const MudarisImageStorage = `${url}/storage/mudaris`

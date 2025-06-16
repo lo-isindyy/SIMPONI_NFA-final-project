@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/header';
-import { imagesStorage } from '../../_api';
+import { SantriImageStorage } from '../../_api';
 import { getSantri } from '../../_services/santri';
 
 export default function PublicSantri() {
@@ -167,7 +167,7 @@ export default function PublicSantri() {
                             <td>
                                 <div className="d-flex align-items-center">
                                 <img
-                                    src={`${imagesStorage}/santri/${santri.pp_santri}`}
+                                    src={`${SantriImageStorage}/${santri.pp_santri}`}
                                     alt={santri.name}
                                     className="rounded-circle me-3"
                                     style={{ width: '40px', height: '40px', objectFit: 'cover' }}

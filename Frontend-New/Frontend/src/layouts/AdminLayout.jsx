@@ -19,7 +19,7 @@ const AdminLayout = ({ children, currentPage }) => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("accessToken");
-  const userInfo = JSON.parse(localStorage.getItem("userInfo") || '{}');
+  const userInfo = JSON.parse(localStorage.getItem("userProfile") || '{}');
   const decodeData = useDecodeToken(token);
 
   useEffect(() => {

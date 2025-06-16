@@ -1,28 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/header';
+import { getClassroom } from '../../_services/classroom';
 
 export default function PublicClassroom() {
-    const [classrooms] = useState([
-        { id: 1, name: "Ruang Tauhid", location: "Gedung A - Lantai 1" },
-        { id: 2, name: "Ruang Fiqih", location: "Gedung A - Lantai 2" },
-        { id: 3, name: "Ruang Hadits", location: "Gedung B - Lantai 1" },
-        { id: 4, name: "Ruang Tafsir", location: "Gedung B - Lantai 2" },
-        { id: 5, name: "Ruang Nahwu", location: "Gedung C - Lantai 1" },
-        { id: 6, name: "Ruang Sharaf", location: "Gedung C - Lantai 2" },
-        { id: 7, name: "Ruang Balaghah", location: "Gedung D - Lantai 1" },
-        { id: 8, name: "Ruang Aqidah", location: "Gedung D - Lantai 2" }
-    ]);
-
+    const [classrooms, setClassrooms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterGedung, setFilterGedung] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(6);
     const [isHovered, setIsHovered] = useState(false);
 
+    useEffect(() => {
+        fetchClassrooms();
+    }, []);
+
+    const fetchClassrooms = async () => {
+        try {
+            setLoading(true);
+            const data = await getClassroom();
+            setClassrooms(data);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching classrooms:', err);
+            setError('Gagal memuat data ruang kelas');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleReset = () => {
         setSearchTerm('');
         setFilterGedung('');
         setCurrentPage(1);
+    };
+
+    const handleRefresh = async () => {
+        await fetchClassrooms();
+        handleReset();
     };
 
     const filteredClassrooms = classrooms.filter(room =>
@@ -40,16 +56,28 @@ export default function PublicClassroom() {
         return buildings;
     };
 
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <div className="container text-center py-5">
+                    <div className="spinner-border text-primary mb-3" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="text-muted">Memuat data ruang kelas...</p>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
-        <Header />
+            <Header />
             <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
             <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet" />
 
             <div style={{ backgroundColor: 'rgb(239, 244, 252)' }} className="min-vh-100 py-4">
                 <div className="container-fluid">
-
-                    {/* Header */}
                     <div className="mb-4 mt-4 mx-4">
                         <div className="d-flex align-items-center mb-4">
                             <div className="p-3 rounded me-3 text-white" style={{ backgroundColor: '#D4B896' }}>
@@ -62,7 +90,21 @@ export default function PublicClassroom() {
                         </div>
                     </div>
 
-                    {/* Stats */}
+                    {error && (
+                        <div className="alert alert-danger mx-4 mb-4" role="alert">
+                            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                            {error}
+                            <button 
+                                type="button" 
+                                className="btn btn-sm btn-outline-danger ms-3"
+                                onClick={handleRefresh}
+                            >
+                                <i className="bi bi-arrow-clockwise me-1"></i>
+                                Coba Lagi
+                            </button>
+                        </div>
+                    )}
+
                     <div className="row mb-4 mx-2">
                         <div className="col-md-6 mb-3">
                             <div className="card border-0 shadow-sm">
@@ -92,7 +134,6 @@ export default function PublicClassroom() {
                         </div>
                     </div>
 
-                    {/* Filters */}
                     <div className="card border-0 shadow-sm mb-5 mx-4">
                         <div className="card-body">
                             <div className="row">
@@ -146,12 +187,19 @@ export default function PublicClassroom() {
                         </div>
                     </div>
 
-                    {/* Cards */}
                     <div className="card border-0 shadow-sm mb-5 mx-4">
                         <div className="card-header bg-white d-flex justify-content-between align-items-center">
                             <h5 className="mb-0 fw-bold">
                                 Daftar Ruang Kelas ({filteredClassrooms.length} dari {classrooms.length})
                             </h5>
+                            <button 
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={handleRefresh}
+                                disabled={loading}
+                            >
+                                <i className="bi bi-arrow-clockwise me-1"></i>
+                                Refresh
+                            </button>
                         </div>
                         <div className="card-body">
                             <div className="row">
@@ -192,7 +240,7 @@ export default function PublicClassroom() {
                                         </div>
                                     </div>
                                 ))}
-                                
+
                                 {currentItems.length === 0 && (
                                     <div className="col-12">
                                         <div className="text-center py-5">
@@ -207,7 +255,6 @@ export default function PublicClassroom() {
                             </div>
                         </div>
 
-                        {/* Pagination */}
                         {totalPages > 1 && (
                             <nav className="mt-3">
                                 <ul className="pagination justify-content-center mb-3">
