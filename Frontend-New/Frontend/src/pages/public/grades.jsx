@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../components/header';
 import { getGrades } from '../../_services/grades';
+import Header from '../../components/header';
 
 export default function PublicGrades() {
     const [grades, setGrades] = useState([]);
