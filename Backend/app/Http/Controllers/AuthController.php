@@ -2,13 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Mudaris;
+use App\Models\Santri;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    public function registerMudaris(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mudaris_id' => 'required|exists:mudaris,id',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:8'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $mudaris = Mudaris::findOrFail($request->mudaris_id);
+
+        $user = User::create([
+            'name' => $mudaris->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'mudaris',
+        ]);
+
+        $mudaris->user_id = $user->id;
+        $mudaris->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mudaris berhasil diregistrasi',
+            'data' => $user
+        ], 201);
+    }
+
     public function showSignupForm()
     {
         return view('auth.signup');
@@ -17,7 +54,7 @@ class AuthController extends Controller
     {
         // 1. validator
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:50',
+            'santri_id' => 'required|exists:santri,id',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|min:8'
         ]);
@@ -30,12 +67,17 @@ class AuthController extends Controller
             ], 422);
         }
 
+        $santri = Santri::findOrFail($request->santri_id);
+
         $user = User::create([
-            'name' => $request->name,
+            'name' => $santri->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
 
         ]);
+
+        $santri->user_id = $user->id;
+        $santri->save();
 
         if ($user) {
             return response()->json([
@@ -56,20 +98,20 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-    public function login (Request $request)
+    public function login(Request $request)
     {
-        $validator = validator::make($request->all(),[
+        $validator = validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if ($validator->fails()){
-            return response()->json($validator->errors(),422);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
         }
 
-        $credentials = $request -> only('email', 'password');
+        $credentials = $request->only('email', 'password');
 
-        if (!$token = auth()->guard('api')->attempt($credentials)){
+        if (!$token = auth()->guard('api')->attempt($credentials)) {
             return response()->json([
                 'success' => false,
                 'message' => 'email atau password salah'
@@ -79,13 +121,27 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login Berhasil',
-            'user'    => auth()-> guard('api') -> user(),
+            'user'    => auth()->guard('api')->user(),
             'token'   => $token
         ], 200);
     }
 
     public function logout()
     {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout Successfully',
+            ], 200);
+        } catch (JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logout Failed!',
+            ], 500);
+        }
+        
         auth()->guard('api')->logout();
         return response()->json([
             'success' => true,

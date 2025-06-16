@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class mudaris extends Model
+class Mudaris extends Model
 {
     protected $table = 'mudaris';
 
@@ -14,6 +14,21 @@ class mudaris extends Model
         'address',
         'no_hp',
         'pp_mudaris',
+        'user_id'
     ];
-    
+
+    public function dorms()
+    {
+        return $this->hasMany(Dorm::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

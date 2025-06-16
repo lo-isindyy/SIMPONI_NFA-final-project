@@ -2,16 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\santri;
+use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class SantriController extends Controller
 {
+
+    public function availableSantri()
+    {
+        $santri = Santri::whereNull('user_id')->get(['id', 'name']);
+
+        if ($santri->isEmpty()) {
+            return response()->json([
+                "success" => true,
+                "message" => "Semua santri sudah punya akun!"
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $santri
+        ]);
+    }
     public function index()
     {
-        $santri = santri::all();
+        $santri = Santri::all();
 
         if ($santri->isEmpty()) {
             return response()->json([
@@ -74,48 +91,51 @@ class SantriController extends Controller
         ], 201);
     }
 
-    public function show(string $id)
+    public function show()
     {
-        $santri = santri::find($id);
+        $user = auth('api')->user();
+
+        if ($user->role !== 'santri') {
+            return response()->json([
+                "success" => false,
+                "message" => "Unauthorized access, only santri can view this"
+            ], 403);
+        }
+
+        $santri = Santri::where('user_id', $user->id)->first();
 
         if (!$santri) {
             return response()->json([
                 "success" => false,
-                "message" => "resources not found"
+                "message" => "Santri profile not found"
             ], 404);
         }
 
         return response()->json([
             "success" => true,
-            "message" => "Get resources detail",
             "data" => $santri
-        ], 200);
+        ]);
     }
 
     public function update(string $id, Request $request)
     {
-        // dd($request->all());
-
-        $santri = santri::find($id);
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([
                 "success" => false,
-                "message" => "resources not found"
+                "message" => "Santri data not found"
             ], 404);
         }
 
-        // 1. validator 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
-            // 'gender' => 'required|string',
             'tgl_lahir' => 'nullable|date',
             'address' => 'nullable|string',
             'no_hp' => 'nullable|string|max:25',
             'pp_santri' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
         ]);
 
-        // 2. check validator error 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -125,7 +145,6 @@ class SantriController extends Controller
 
         $data = [
             'name' => $request->name,
-            // 'gender' => $request->gender,
             'tgl_lahir' => $request->tgl_lahir,
             'address' => $request->address,
             'no_hp' => $request->no_hp,
@@ -146,14 +165,14 @@ class SantriController extends Controller
 
         return response()->json([
             "success" => true,
-            "message" => "resources updated",
+            "message" => "Profile updated",
             "data" => $santri
-        ], 200);
+        ]);
     }
 
     public function destroy(string $id)
     {
-        $santri = santri::find($id);
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([

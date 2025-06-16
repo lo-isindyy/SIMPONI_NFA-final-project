@@ -1,191 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import AppLayout from '../components/AppLayout';
+import { useEffect, useState } from "react";
+import AppLayout from "../components/AppLayout";
+import {getDormAssignments, createDormAssignment, updateDormAssignment, deleteDormAssignment,} from "../_services/dormAssignment";
+import { getDorms } from "../_services/dorms";
+import { getSantri } from "../_services/santri";
 
-const DormAssignment = () => {
-  const [assignmentsList, setAssignmentsList] = useState([]);
-  const [formData, setFormData] = useState({
-    santri_id: '',
-    dorm_id: '',
-    entry_date: '',
-    exit_date: ''
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editKey, setEditKey] = useState('');
 
-  // Data dummy untuk santri
-  const santriList = [
-    { id: 1, name: 'Ahmad Rizki Maulana', gender: 'Laki-laki' },
-    { id: 2, name: 'Muhammad Faiz Abdullah', gender: 'Laki-laki' },
-    { id: 3, name: 'Siti Aisyah Rahmawati', gender: 'Perempuan' },
-    { id: 4, name: 'Fatimah Zahara Putri', gender: 'Perempuan' },
-    { id: 5, name: 'Ali Hassan Mubarak', gender: 'Laki-laki' },
-    { id: 6, name: 'Khadijah Salma Azzahra', gender: 'Perempuan' },
-    { id: 7, name: 'Omar Faruk Hakim', gender: 'Laki-laki' },
-    { id: 8, name: 'Aminah Nur Hidayah', gender: 'Perempuan' }
-  ];
-
-  // Data dummy untuk asrama
-  const dormsList = [
-    { id: 1, name: 'Asrama Putra A', capacity: 50, mudaris_name: 'Ustadz Ahmad Fauzi' },
-    { id: 2, name: 'Asrama Putra B', capacity: 45, mudaris_name: 'Ustadz Muhammad Ridwan' },
-    { id: 3, name: 'Asrama Putri A', capacity: 40, mudaris_name: 'Ustadzah Siti Khadijah' },
-    { id: 4, name: 'Asrama Putri B', capacity: 35, mudaris_name: 'Ustadzah Fatimah Az-Zahra' }
-  ];
-
-  useEffect(() => {
-    // Data dummy untuk dorm assignments
-    setAssignmentsList([
-      {
-        santri_id: 1,
-        dorm_id: 1,
-        entry_date: '2024-01-15',
-        exit_date: '2024-12-15',
-        santri_name: 'Ahmad Rizki Maulana',
-        dorm_name: 'Asrama Putra A',
-        mudaris_name: 'Ustadz Ahmad Fauzi'
-      },
-      {
-        santri_id: 2,
-        dorm_id: 2,
-        entry_date: '2024-01-16',
-        exit_date: '2024-12-16',
-        santri_name: 'Muhammad Faiz Abdullah',
-        dorm_name: 'Asrama Putra B',
-        mudaris_name: 'Ustadz Muhammad Ridwan'
-      },
-      {
-        santri_id: 3,
-        dorm_id: 3,
-        entry_date: '2024-01-20',
-        exit_date: '2024-12-20',
-        santri_name: 'Siti Aisyah Rahmawati',
-        dorm_name: 'Asrama Putri A',
-        mudaris_name: 'Ustadzah Siti Khadijah'
-      },
-      {
-        santri_id: 4,
-        dorm_id: 4,
-        entry_date: '2024-02-01',
-        exit_date: '2024-12-31',
-        santri_name: 'Fatimah Zahara Putri',
-        dorm_name: 'Asrama Putri B',
-        mudaris_name: 'Ustadzah Fatimah Az-Zahra'
-      },
-      {
-        santri_id: 5,
-        dorm_id: 1,
-        entry_date: '2024-02-15',
-        exit_date: '2024-12-15',
-        santri_name: 'Ali Hassan Mubarak',
-        dorm_name: 'Asrama Putra A',
-        mudaris_name: 'Ustadz Ahmad Fauzi'
+export default function DormAssignment() {
+    const [assignments, setAssignments] = useState([]);
+    const [dorms, setDorms] = useState([]);
+    const [santris, setSantris] = useState([]);
+    const [formData, setFormData] = useState({
+      santri_id: "",
+      dorm_id: "",
+      room_number: "",
+      assigned_date: "", 
+    });
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+  
+    useEffect(() => {
+      async function fetchData() {
+        const [assignmentsData, dormsData, santrisData] = await Promise.all([
+          getDormAssignments(),
+          getDorms(),
+          getSantri(),
+        ]);
+        setAssignments(assignmentsData);
+        setDorms(dormsData);
+        setSantris(santrisData);
       }
-    ]);
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const getAssignmentKey = (santri_id, dorm_id) => {
-    return `${santri_id}-${dorm_id}`;
-  };
-
-  const getStatusBadge = (entry_date, exit_date) => {
-    const today = new Date();
-    const entryDate = new Date(entry_date);
-    const exitDate = new Date(exit_date);
-    
-    if (today < entryDate) {
-      return { status: 'Belum Masuk', class: 'status-pending' };
-    } else if (today > exitDate) {
-      return { status: 'Sudah Keluar', class: 'status-expired' };
-    } else {
-      return { status: 'Aktif', class: 'status-active' };
-    }
-  };
-
-  const getDormOccupancy = (dorm_id) => {
-    const activeAssignments = assignmentsList.filter(assignment => {
-      const today = new Date();
-      const entryDate = new Date(assignment.entry_date);
-      const exitDate = new Date(assignment.exit_date);
-      return assignment.dorm_id === dorm_id && today >= entryDate && today <= exitDate;
-    });
-    const dorm = dormsList.find(d => d.id === dorm_id);
-    return {
-      occupied: activeAssignments.length,
-      capacity: dorm ? dorm.capacity : 0
+      fetchData();
+    }, []);
+  
+    const getDormName = (id) => {
+      const dorm = dorms.find((d) => d.id === id);
+      return dorm ? dorm.name : "-";
     };
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const selectedSantri = santriList.find(s => s.id === parseInt(formData.santri_id));
-    const selectedDorm = dormsList.find(d => d.id === parseInt(formData.dorm_id));
+  
+    const getSantriName = (id) => {
+      const santri = santris.find((s) => s.id === id);
+      return santri ? santri.name : "-";
+    };
+  
+    // Hitung jumlah penghuni per dorm
+    const countAssignedInDorm = (dorm_id) => {
+      return assignments.filter((a) => a.dorm_id === dorm_id).length;
+    };
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((f) => ({ ...f, [name]: value }));
+    };
+  
+    const resetForm = () => {
+      setFormData({
+        santri_id: "",
+        dorm_id: "",
+        entry_date: "",
+        exit_date: "",
+      });
+      setIsEditing(false);
+      setEditId(null);
+    };
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault();
     
-    const newAssignment = {
-      santri_id: parseInt(formData.santri_id),
-      dorm_id: parseInt(formData.dorm_id),
-      entry_date: formData.entry_date,
-      exit_date: formData.exit_date,
-      santri_name: selectedSantri.name,
-      dorm_name: selectedDorm.name,
-      mudaris_name: selectedDorm.mudaris_name
+      try {
+        const dormCapacity = dorms.find(d => d.id === Number(formData.dorm_id))?.capacity || 0;
+        const assignedCount = assignments.filter(a => a.dorm_id === Number(formData.dorm_id) && (!isEditing || a.id !== editId)).length;
+    
+        if (!isEditing && assignedCount >= dormCapacity) {
+          alert("Kapasitas asrama sudah penuh, tidak bisa menambah penempatan.");
+          return;
+        }
+    
+        if (isEditing) {
+          await updateDormAssignment(editId, { ...formData, _method: 'PUT' });
+        } else {
+          await createDormAssignment(formData);
+        }        
+    
+        const assignmentsData = await getDormAssignments();
+        setAssignments(assignmentsData);
+    
+        resetForm();
+      } catch (err) {
+        console.error(err);
+        alert("Gagal menyimpan data");
+      }
+    };    
+  
+    const handleEdit = (assignment) => {
+      setFormData({
+        santri_id: assignment.santri_id,
+        dorm_id: assignment.dorm_id,
+        entry_date: assignment.entry_date || "",
+        exit_date: assignment.exit_date || "",
+      });
+      setIsEditing(true);
+      setEditId(assignment.id);
     };
     
-    if (isEditing) {
-      setAssignmentsList(assignmentsList.map(a => 
-        getAssignmentKey(a.santri_id, a.dorm_id) === editKey
-          ? newAssignment
-          : a
-      ));
-    } else {
-      // Check if assignment already exists
-      const existingAssignment = assignmentsList.find(a => 
-        a.santri_id === parseInt(formData.santri_id) && a.dorm_id === parseInt(formData.dorm_id)
-      );
-      
-      if (existingAssignment) {
-        alert('Santri sudah memiliki penempatan di asrama ini!');
-        return;
+  
+    const handleDelete = async (id) => {
+      if (!window.confirm("Yakin ingin menghapus data ini?")) return;
+      try {
+        await deleteDormAssignment(id);
+        setAssignments(assignments.filter((a) => a.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert("Gagal menghapus data");
       }
-      
-      setAssignmentsList([...assignmentsList, newAssignment]);
-    }
-    
-    setFormData({ santri_id: '', dorm_id: '', entry_date: '', exit_date: '' });
-    setIsEditing(false);
-    setEditKey('');
-  };
-
-  const handleEdit = (assignment) => {
-    setFormData({
-      santri_id: assignment.santri_id.toString(),
-      dorm_id: assignment.dorm_id.toString(),
-      entry_date: assignment.entry_date,
-      exit_date: assignment.exit_date
-    });
-    setEditKey(getAssignmentKey(assignment.santri_id, assignment.dorm_id));
-    setIsEditing(true);
-  };
-
-  const handleDelete = (santri_id, dorm_id) => {
-    if (window.confirm('Yakin ingin menghapus pembagian kamar ini?')) {
-      setAssignmentsList(assignmentsList.filter(a => 
-        !(a.santri_id === santri_id && a.dorm_id === dorm_id)
-      ));
-    }
-  };
+    };
 
   return (
     <>
@@ -816,28 +743,6 @@ const DormAssignment = () => {
           </p>
         </div>
 
-        <div className="stats-container fade-in">
-          {dormsList.map(dorm => {
-            const occupancy = getDormOccupancy(dorm.id);
-            const percentage = (occupancy.occupied / occupancy.capacity) * 100;
-            return (
-              <div key={dorm.id} className="stat-card">
-                <h3>{dorm.name}</h3>
-                <p className="stat-number">{occupancy.occupied}/{occupancy.capacity}</p>
-                <div className="occupancy-bar">
-                  <div 
-                    className="occupancy-fill" 
-                    style={{ width: `${percentage}%` }}
-                  ></div>
-                </div>
-                <p className="stat-detail">
-                  {percentage.toFixed(1)}% terisi • {dorm.mudaris_name}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
         <div className="form-container fade-in">
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
@@ -851,9 +756,9 @@ const DormAssignment = () => {
                   required
                 >
                   <option value="">Pilih Santri</option>
-                  {santriList.map(santri => (
+                  {santris.map(santri => (
                     <option key={santri.id} value={santri.id}>
-                      {santri.name} ({santri.gender})
+                      {santri.name}
                     </option>
                   ))}
                 </select>
@@ -861,52 +766,48 @@ const DormAssignment = () => {
               
               <div className="form-group">
                 <label htmlFor="dorm_id">Asrama</label>
-                <select 
+                <select
                   id="dorm_id"
-                  name="dorm_id" 
-                  value={formData.dorm_id} 
-                  onChange={handleChange} 
+                  name="dorm_id"
+                  value={formData.dorm_id}
+                  onChange={handleChange}
                   required
                 >
-                  <option value="">Pilih Asrama</option>
-                  {dormsList.map(dorm => {
-                    const occupancy = getDormOccupancy(dorm.id);
-                    return (
-                      <option key={dorm.id} value={dorm.id}>
-                        {dorm.name} ({occupancy.occupied}/{occupancy.capacity})
-                      </option>
-                    );
-                  })}
+                  <option value="">---Pilih Asrama---</option>
+                  {dorms.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name} (Kapasitas: {d.capacity}, Terisi: {countAssignedInDorm(d.id)})
+                    </option>
+                  ))}
                 </select>
               </div>
               
               <div className="form-group">
                 <label htmlFor="entry_date">Tanggal Masuk</label>
-                <input 
-                  id="entry_date"
+                <input
                   type="date"
-                  name="entry_date" 
-                  value={formData.entry_date} 
-                  onChange={handleChange} 
-                  required 
+                  id="entry_date"
+                  name="entry_date"
+                  value={formData.entry_date}
+                  onChange={handleChange}
+                  required
                 />
               </div>
-              
+
               <div className="form-group">
-                <label htmlFor="exit_date">Tanggal Keluar</label>
-                <input 
-                  id="exit_date"
+                <label htmlFor="exit_date">Tanggal Keluar (Opsional)</label>
+                <input
                   type="date"
-                  name="exit_date" 
-                  value={formData.exit_date} 
-                  onChange={handleChange} 
-                  required 
+                  id="exit_date"
+                  name="exit_date"
+                  value={formData.exit_date}
+                  onChange={handleChange}
                 />
               </div>
             </div>
             
             <button type="submit" className="btn-primary">
-              {isEditing ? 'Update Pembagian Kamar' : 'Tambah Pembagian Kamar'}
+              {isEditing ? "Update Penempatan" : "Tambah Penempatan"}
             </button>
           </form>
         </div>
@@ -916,49 +817,42 @@ const DormAssignment = () => {
             <table>
               <thead>
                 <tr>
-                  <th>Nama Santri</th>
+                  <th>ID</th>
+                  <th>Santri</th>
                   <th>Asrama</th>
-                  <th>Pengasuh</th>
                   <th>Tanggal Masuk</th>
                   <th>Tanggal Keluar</th>
-                  <th>Status</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {assignmentsList.map(assignment => {
-                  const statusInfo = getStatusBadge(assignment.entry_date, assignment.exit_date);
-                  return (
-                    <tr key={getAssignmentKey(assignment.santri_id, assignment.dorm_id)}>
-                      <td>{assignment.santri_name}</td>
-                      <td>
-                        {assignment.dorm_name}
-                        <div className="occupancy-info">
-                          {(() => {
-                            const occupancy = getDormOccupancy(assignment.dorm_id);
-                            return `${occupancy.occupied}/${occupancy.capacity} terisi`;
-                          })()}
-                        </div>
-                      </td>
-                      <td>{assignment.mudaris_name}</td>
-                      <td>{formatDate(assignment.entry_date)}</td>
-                      <td>{formatDate(assignment.exit_date)}</td>
-                      <td>
-                        <span className={`status-badge ${statusInfo.class}`}>
-                          {statusInfo.status}
-                        </span>
-                      </td>
-                      <td className="action-buttons">
-                        <button className="btn-edit" onClick={() => handleEdit(assignment)}>
+                {assignments.map((a) => (
+                  <tr key={a.id}>
+                    <td>{a.id}</td>
+                    <td>{getSantriName(a.santri_id)}</td>
+                    <td>{getDormName(a.dorm_id)}</td>
+                    <td>{a.entry_date}</td>
+                    <td>{a.exit_date}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          type="button"
+                          className="btn-edit"
+                          onClick={() => handleEdit(a)}
+                        >
                           Edit
                         </button>
-                        <button className="btn-delete" onClick={() => handleDelete(assignment.santri_id, assignment.dorm_id)}>
+                        <button
+                          type="button"
+                          className="btn-delete"
+                          onClick={() => handleDelete(a.id)}
+                        >
                           Hapus
                         </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -966,6 +860,4 @@ const DormAssignment = () => {
       </AppLayout>
     </>
   );
-};
-
-export default DormAssignment;
+}

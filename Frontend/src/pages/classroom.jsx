@@ -1,76 +1,78 @@
 import React, { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
+import {createClassroom, updateClassroom, deleteClassroom, getClassroom,} from "../_services/classroom";
 
 const Classrooms = () => {
   const [classroomsList, setClassroomsList] = useState([]);
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
     location: "",
   });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setClassroomsList([
-      {
-        id: 1,
-        name: "Kelas 1A",
-        location: "Gedung Utama Lantai 1",
-      },
-      {
-        id: 2,
-        name: "Kelas 1B",
-        location: "Gedung Utama Lantai 1",
-      },
-      {
-        id: 3,
-        name: "Kelas 2A",
-        location: "Gedung Utama Lantai 2",
-      },
-      {
-        id: 4,
-        name: "Kelas 2B",
-        location: "Gedung Utama Lantai 2",
-      },
-      {
-        id: 5,
-        name: "Lab Komputer",
-        location: "Gedung Penunjang Lantai 1",
-      },
-      {
-        id: 6,
-        name: "Lab Bahasa",
-        location: "Gedung Penunjang Lantai 2",
-      },
-    ]);
+    fetchClassrooms();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const fetchClassrooms = async () => {
+    try {
+      const data = await getClassroom();
+      setClassroomsList(data);
+    } catch (error) {
+      console.error("Gagal fetch data ruang kelas", error);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isEditing) {
-      setClassroomsList(
-        classroomsList.map((c) => (c.id === formData.id ? formData : c))
-      );
-    } else {
-      setClassroomsList([...classroomsList, { ...formData, id: Date.now() }]);
+
+    try {
+      if (isEditing) {
+        await updateClassroom(formData.id, formData);
+      } else {
+        await createClassroom(formData);
+      }
+      await fetchClassrooms();
+      resetForm();
+    } catch (error) {
+      console.error("Gagal simpan data ruang kelas", error);
+      alert("Gagal menyimpan data ruang kelas.");
     }
-    setFormData({ id: "", name: "", location: "" });
-    setIsEditing(false);
   };
 
   const handleEdit = (classroom) => {
-    setFormData(classroom);
+    setFormData({
+      id: classroom.id,
+      name: classroom.name,
+      location: classroom.location,
+      _method: "PUT", // jika diperlukan untuk backend
+    });
     setIsEditing(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Yakin ingin menghapus data ruang kelas ini?")) {
-      setClassroomsList(classroomsList.filter((c) => c.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Yakin ingin menghapus data ruang kelas ini?")) return;
+
+    try {
+      await deleteClassroom(id);
+      await fetchClassrooms();
+    } catch (error) {
+      console.error("Gagal menghapus data ruang kelas", error);
+      alert("Gagal menghapus data ruang kelas.");
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      location: "",
+    });
+    setIsEditing(false);
   };
 
   return (

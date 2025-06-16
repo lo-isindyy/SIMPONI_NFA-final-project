@@ -1,55 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import AppLayout from '../components/AppLayout';
+import React, { useState, useEffect } from "react";
+import AppLayout from "../components/AppLayout";
+import {getSantri, createSantri, updateSantri, deleteSantri,} from "../_services/santri";
 
-const Santri = () => {
+export default function AdminSantri() {
   const [santriList, setSantriList] = useState([]);
   const [formData, setFormData] = useState({
-    id: '',
-    name: '',
-    gender: '',
-    tgl_lahir: '',
-    address: '',
-    no_hp: ''
+    name: "",
+    tgl_lahir: "",
+    address: "",
+    no_hp: "",
+    pp_santri: null,
   });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setSantriList([
-      {
-        id: 1,
-        name: 'Ahmad Yusuf',
-        gender: 'Laki-laki',
-        tgl_lahir: '2005-08-15',
-        address: 'Jalan Merdeka 12',
-        no_hp: '08123456789'
-      }
-    ]);
+    const fetchData = async () => {
+      const santriData = await getSantri();
+      setSantriList(santriData);
+    };
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const { name, value, files } = e.target;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      setSantriList(santriList.map(s => s.id === formData.id ? formData : s));
+    if (name === "pp_santri") {
+      setFormData((prev) => ({ ...prev, pp_santri: files[0] }));
     } else {
-      setSantriList([...santriList, { ...formData, id: Date.now() }]);
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    setFormData({ id: '', name: '', gender: '', tgl_lahir: '', address: '', no_hp: '' });
-    setIsEditing(false);
   };
 
-  const handleEdit = (santri) => {
-    setFormData(santri);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const payload = new FormData();
+
+      for (const key in formData) {
+        if (formData[key] !== null && formData[key] !== undefined) {
+          payload.append(key, formData[key]);
+        }
+      }
+
+      if (isEditing) {
+        payload.append("_method", "PUT");
+        await updateSantri(formData.id, payload);
+      } else {
+        await createSantri(payload);
+      }
+
+      const updatedList = await getSantri();
+      setSantriList(updatedList);
+      resetForm();
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menyimpan data.");
+    }
+  };
+
+  const handleEdit = (data) => {
+    setFormData({
+      id: data.id,
+      name: data.name,
+      tgl_lahir: data.tgl_lahir,
+      address: data.address,
+      no_hp: data.no_hp,
+      pp_santri: null, // biar user bisa upload ulang jika ingin
+    });
     setIsEditing(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Yakin ingin menghapus data ini?')) {
-      setSantriList(santriList.filter(s => s.id !== id));
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Yakin ingin menghapus data ini?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteSantri(id);
+      const updatedList = await getSantri();
+      setSantriList(updatedList);
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menghapus data.");
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      tgl_lahir: "",
+      address: "",
+      no_hp: "",
+      pp_santri: null,
+    });
+    setIsEditing(false);
   };
 
   return (
@@ -311,25 +355,6 @@ const Santri = () => {
           gap: 0.5rem;
         }
 
-        .gender-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .gender-male {
-          background-color: #dbeafe;
-          color: #1e40af;
-        }
-
-        .gender-female {
-          background-color: #fce7f3;
-          color: #be185d;
-        }
-
         @media (max-width: 768px) {
           .navbar {
             padding: 8px 16px 16px 16px;
@@ -427,20 +452,6 @@ const Santri = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="gender">Jenis Kelamin</label>
-                <select 
-                  id="gender"
-                  name="gender" 
-                  value={formData.gender} 
-                  onChange={handleChange} 
-                  required
-                >
-                  <option value="">Pilih Jenis Kelamin</option>
-                  <option value="Laki-laki">Laki-laki</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
                 <label htmlFor="tgl_lahir">Tanggal Lahir</label>
                 <input 
                   id="tgl_lahir"
@@ -476,6 +487,17 @@ const Santri = () => {
                   required 
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="pp_santri">Foto Santri (Opsional)</label>
+                <input
+                  id="pp_santri"
+                  type="file"
+                  name="pp_santri"
+                  accept="image/*"
+                  onChange={handleChange}
+                />
+              </div>
             </div>
             
             <button type="submit" className="btn-primary">
@@ -490,11 +512,12 @@ const Santri = () => {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>User ID</th>
                   <th>Nama</th>
-                  <th>Jenis Kelamin</th>
                   <th>Tanggal Lahir</th>
                   <th>Alamat</th>
                   <th>No HP</th>
+                  <th>Profile</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -502,15 +525,12 @@ const Santri = () => {
                 {santriList.map(santri => (
                   <tr key={santri.id}>
                     <td>{santri.id}</td>
+                    <td>{santri.id}</td>
                     <td>{santri.name}</td>
-                    <td>
-                      <span className={`gender-badge ${santri.gender === 'Laki-laki' ? 'gender-male' : 'gender-female'}`}>
-                        {santri.gender}
-                      </span>
-                    </td>
                     <td>{new Date(santri.tgl_lahir).toLocaleDateString('id-ID')}</td>
                     <td>{santri.address}</td>
                     <td>{santri.no_hp}</td>
+                    <td>{santri.pp_santri}</td>
                     <td className="action-buttons">
                       <button className="btn-edit" onClick={() => handleEdit(santri)}>
                         Edit
@@ -529,5 +549,3 @@ const Santri = () => {
     </>
   );
 };
-
-export default Santri;

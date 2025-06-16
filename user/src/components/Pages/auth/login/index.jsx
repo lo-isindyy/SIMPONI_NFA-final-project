@@ -28,6 +28,7 @@ export default function Login() {
       // console.log(data);
       if (res.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("accessToken", data.token);
         navigate("/dashboards");
       } else {
         alert(data.errors || { general: data.message } || "Login failed");

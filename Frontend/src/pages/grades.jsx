@@ -1,119 +1,123 @@
 import React, { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
+import {getGrades, createGrade, updateGrade, deleteGrade } from "../_services/grades"; 
+import { getSantri } from "../_services/santri";
+import { getSubject } from "../_services/subject";
 
-const Grades = () => {
+const Grades = ({ santrisList = [], subjectsList = [] }) => {
   const [gradesList, setGradesList] = useState([]);
+  const [santris, setSantris] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [formData, setFormData] = useState({
     santri_id: "",
     subject_id: "",
     grade: "",
   });
   const [isEditing, setIsEditing] = useState(false);
-
-  // Data dummy untuk santri
-  const santrisList = [
-    { id: 1, name: "Ahmad Fauzan", classroom: "Kelas 1A" },
-    { id: 2, name: "Muhammad Ridho", classroom: "Kelas 1A" },
-    { id: 3, name: "Siti Aisyah", classroom: "Kelas 1B" },
-    { id: 4, name: "Fatimah Zahra", classroom: "Kelas 1B" },
-    { id: 5, name: "Abdullah Hassan", classroom: "Kelas 2A" },
-    { id: 6, name: "Aminah Yusuf", classroom: "Kelas 2A" },
-    { id: 7, name: "Umar Faruq", classroom: "Kelas 2B" },
-    { id: 8, name: "Khadijah Binti Ali", classroom: "Kelas 2B" },
-    { id: 9, name: "Ali Bin Abu Talib", classroom: "Kelas 3A" },
-    { id: 10, name: "Maryam Binti Imran", classroom: "Kelas 3A" },
-  ];
-
-  // Data dummy untuk mata pelajaran
-  const subjectsList = [
-    { id: 1, name: "Tahfidz Al-Quran", classroom: "Kelas 1A" },
-    { id: 2, name: "Fiqh", classroom: "Kelas 1B" },
-    { id: 3, name: "Akidah Akhlak", classroom: "Kelas 2A" },
-    { id: 4, name: "Bahasa Arab", classroom: "Kelas 2B" },
-    { id: 5, name: "Tafsir Al-Quran", classroom: "Kelas 3A" },
-    { id: 6, name: "Hadits", classroom: "Kelas 3B" },
-    { id: 7, name: "Sejarah Islam", classroom: "Kelas 1A" },
-    { id: 8, name: "Ilmu Tajwid", classroom: "Kelas 2A" },
-  ];
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
-    // Data dummy untuk grades
-    setGradesList([
-      {
-        santri_id: 1,
-        subject_id: 1,
-        grade: 85,
-        santri_name: "Ahmad Fauzan",
-        subject_name: "Tahfidz Al-Quran",
-        classroom: "Kelas 1A",
-        created_at: "2024-01-15T10:30:00",
-        updated_at: "2024-01-15T10:30:00",
-      },
-      {
-        santri_id: 2,
-        subject_id: 1,
-        grade: 92,
-        santri_name: "Muhammad Ridho",
-        subject_name: "Tahfidz Al-Quran",
-        classroom: "Kelas 1A",
-        created_at: "2024-01-15T10:35:00",
-        updated_at: "2024-01-15T10:35:00",
-      },
-      {
-        santri_id: 3,
-        subject_id: 2,
-        grade: 78,
-        santri_name: "Siti Aisyah",
-        subject_name: "Fiqh",
-        classroom: "Kelas 1B",
-        created_at: "2024-01-16T09:15:00",
-        updated_at: "2024-01-16T09:15:00",
-      },
-      {
-        santri_id: 4,
-        subject_id: 2,
-        grade: 88,
-        santri_name: "Fatimah Zahra",
-        subject_name: "Fiqh",
-        classroom: "Kelas 1B",
-        created_at: "2024-01-16T09:20:00",
-        updated_at: "2024-01-16T09:20:00",
-      },
-      {
-        santri_id: 5,
-        subject_id: 3,
-        grade: 95,
-        santri_name: "Abdullah Hassan",
-        subject_name: "Akidah Akhlak",
-        classroom: "Kelas 2A",
-        created_at: "2024-01-17T11:00:00",
-        updated_at: "2024-01-17T11:00:00",
-      },
-      {
-        santri_id: 6,
-        subject_id: 3,
-        grade: 82,
-        santri_name: "Aminah Yusuf",
-        subject_name: "Akidah Akhlak",
-        classroom: "Kelas 2A",
-        created_at: "2024-01-17T11:05:00",
-        updated_at: "2024-01-17T11:05:00",
-      },
-    ]);
+    const fetchData = async () => {
+      try {
+        const [gradesData, santriData, subjectData] = await Promise.all([
+          getGrades(),
+          getSantri(),
+          getSubject(),
+        ]);
+        setGradesList(gradesData);
+        setSantris(santriData);
+        setSubjects(subjectData);
+      } catch (err) {
+        console.error("Gagal memuat data:", err);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
+  const getSantriName = (id) => {
+    const santri = santris.find((s) => s.id === id);
+    return santri ? santri.name : "-";
+  };
+  
+  const getSubjectName = (id) => {
+    const subject = subjects.find((s) => s.id === id);
+    return subject ? subject.name : "-";
+  };
+
+  const getSubjectJenjang = (id) => {
+    const subject = subjects.find((s) => s.id === id);
+    return subject ? subject.jenjang : "-";
+  };
+  
+  
+  const fetchGrades = async () => {
+    try {
+      const data = await getGrades();
+      setGradesList(data);
+    } catch (err) {
+      console.error("Gagal memuat data nilai:", err);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      if (isEditing) {
+        await updateGrade(editId, { ...formData, _method: "PUT" });
+      } else {
+        await createGrade(formData);
+      }
+  
+      const updated = await getGrades();
+      setGradesList(updated);
+  
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menyimpan data nilai");
+    }
+  };
+  
+
+  const handleEdit = (grade) => {
+    setFormData({
+      santri_id: grade.santri_id.toString(),
+      subject_id: grade.subject_id.toString(),
+      grade: grade.grade.toString(),
+    });
+    setEditId(grade.id);
+    setIsEditing(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Yakin ingin menghapus nilai ini?")) {
+      try {
+        await deleteGrade(id);
+        fetchGrades();
+      } catch (err) {
+        console.error("Gagal menghapus nilai:", err);
+        alert("Terjadi kesalahan saat menghapus data.");
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ santri_id: "", subject_id: "", grade: "" });
+    setIsEditing(false);
+    setEditId(null);
+  };
+
   const formatDate = (datetime) => {
     const date = new Date(datetime);
-    return date.toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleString("id-ID", {
+      dateStyle: "long",
+      timeStyle: "short",
     });
   };
 
@@ -131,84 +135,8 @@ const Grades = () => {
     return "Perlu Perbaikan";
   };
 
-  const generateKey = (santri_id, subject_id) => {
-    return `${santri_id}-${subject_id}`;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const selectedSantri = santrisList.find(
-      (s) => s.id === parseInt(formData.santri_id)
-    );
-    const selectedSubject = subjectsList.find(
-      (s) => s.id === parseInt(formData.subject_id)
-    );
-
-    const newGrade = {
-      santri_id: parseInt(formData.santri_id),
-      subject_id: parseInt(formData.subject_id),
-      grade: parseInt(formData.grade),
-      santri_name: selectedSantri.name,
-      subject_name: selectedSubject.name,
-      classroom: selectedSantri.classroom,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    if (isEditing) {
-      setGradesList(
-        gradesList.map((g) =>
-          g.santri_id === parseInt(formData.santri_id) &&
-          g.subject_id === parseInt(formData.subject_id)
-            ? { ...newGrade, created_at: g.created_at }
-            : g
-        )
-      );
-    } else {
-      // Cek apakah kombinasi santri dan subject sudah ada
-      const exists = gradesList.some(
-        (g) =>
-          g.santri_id === parseInt(formData.santri_id) &&
-          g.subject_id === parseInt(formData.subject_id)
-      );
-
-      if (exists) {
-        alert(
-          "Nilai untuk santri dan mata pelajaran ini sudah ada. Gunakan fitur edit untuk mengubah nilai."
-        );
-        return;
-      }
-
-      setGradesList([...gradesList, newGrade]);
-    }
-
-    setFormData({ santri_id: "", subject_id: "", grade: "" });
-    setIsEditing(false);
-  };
-
-  const handleEdit = (grade) => {
-    setFormData({
-      santri_id: grade.santri_id.toString(),
-      subject_id: grade.subject_id.toString(),
-      grade: grade.grade.toString(),
-    });
-    setIsEditing(true);
-  };
-
-  const handleDelete = (santri_id, subject_id) => {
-    if (window.confirm("Yakin ingin menghapus nilai ini?")) {
-      setGradesList(
-        gradesList.filter(
-          (g) => !(g.santri_id === santri_id && g.subject_id === subject_id)
-        )
-      );
-    }
-  };
-
-  const cancelEdit = () => {
-    setFormData({ santri_id: "", subject_id: "", grade: "" });
-    setIsEditing(false);
-  };
+  const generateKey = (santri_id, subject_id) =>
+    `${santri_id}-${subject_id}`;
 
   return (
     <>
@@ -900,9 +828,9 @@ const Grades = () => {
                   disabled={isEditing}
                 >
                   <option value="">Pilih Santri</option>
-                  {santrisList.map((santri) => (
+                  {santris.map((santri) => (
                     <option key={santri.id} value={santri.id}>
-                      {santri.name} - {santri.classroom}
+                      {santri.name}
                     </option>
                   ))}
                 </select>
@@ -919,9 +847,9 @@ const Grades = () => {
                   disabled={isEditing}
                 >
                   <option value="">Pilih Mata Pelajaran</option>
-                  {subjectsList.map((subject) => (
+                  {subjects.map((subject) => (
                     <option key={subject.id} value={subject.id}>
-                      {subject.name} - {subject.classroom}
+                      {subject.name} - {subject.jenjang}
                     </option>
                   ))}
                 </select>
@@ -950,7 +878,7 @@ const Grades = () => {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={cancelEdit}
+                onClick={resetForm}
               >
                 Batal
               </button>
@@ -964,59 +892,20 @@ const Grades = () => {
               <thead>
                 <tr>
                   <th>Nama Santri</th>
-                  <th>Kelas</th>
                   <th>Mata Pelajaran</th>
+                  <th>jenjang</th>
                   <th>Nilai</th>
                   <th>Keterangan</th>
                   <th>Tanggal Input</th>
-                  <th>Terakhir Update</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {gradesList.map((grade) => (
-                  <tr key={generateKey(grade.santri_id, grade.subject_id)}>
-                    <td>
-                      <strong>{grade.santri_name}</strong>
-                    </td>
-                    <td>
-                      <span className="classroom-badge">{grade.classroom}</span>
-                    </td>
-                    <td>
-                      <span
-                        className={`subject-badge ${
-                          grade.subject_name.toLowerCase().includes("tahfidz")
-                            ? "subject-tahfidz"
-                            : grade.subject_name.toLowerCase().includes("fiqh")
-                            ? "subject-fiqh"
-                            : grade.subject_name
-                                .toLowerCase()
-                                .includes("akidah")
-                            ? "subject-akidah"
-                            : grade.subject_name.toLowerCase().includes("arab")
-                            ? "subject-arabic"
-                            : grade.subject_name
-                                .toLowerCase()
-                                .includes("tafsir")
-                            ? "subject-tafsir"
-                            : grade.subject_name
-                                .toLowerCase()
-                                .includes("hadits")
-                            ? "subject-hadits"
-                            : grade.subject_name
-                                .toLowerCase()
-                                .includes("sejarah")
-                            ? "subject-sejarah"
-                            : grade.subject_name
-                                .toLowerCase()
-                                .includes("tajwid")
-                            ? "subject-tajwid"
-                            : "subject-default"
-                        }`}
-                      >
-                        {grade.subject_name}
-                      </span>
-                    </td>
+                  <tr key={grade.id}>
+                    <td>{getSantriName(grade.santri_id)}</td>
+                    <td>{getSubjectName(grade.subject_id)}</td>
+                    <td>{getSubjectJenjang(grade.subject_id)}</td>
                     <td>
                       <span
                         className={`grade-badge ${getGradeColor(grade.grade)}`}
@@ -1032,7 +921,6 @@ const Grades = () => {
                       </span>
                     </td>
                     <td>{formatDate(grade.created_at)}</td>
-                    <td>{formatDate(grade.updated_at)}</td>
                     <td className="action-buttons">
                       <button
                         className="btn-edit"
@@ -1042,9 +930,7 @@ const Grades = () => {
                       </button>
                       <button
                         className="btn-delete"
-                        onClick={() =>
-                          handleDelete(grade.santri_id, grade.subject_id)
-                        }
+                        onClick={() => handleDelete(grade.id)}
                       >
                         Hapus
                       </button>
