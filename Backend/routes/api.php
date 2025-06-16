@@ -18,9 +18,6 @@ Route::get('/user', function (Request $request) {
 //  ini untuk dropdown register santri
 Route::get('/santrilist', [SantriController::class, 'availableSantri']);
 
-// ini untuk dropdown mudaris
-Route::get('/mudarislist', [MudarisController::class, 'availableMudaris']);
-
 // menambahkan data user baru kedalam database
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -41,7 +38,6 @@ route::middleware(['auth:api'])->group(function () {
     // ini bagian admin atau mudaris
     Route::middleware(['role:mudaris'])->group(function () {
 
-        Route::post('/register-mudaris', [AuthController::class, 'registerMudaris']);
         Route::apiResource('/dorm_asigments', DormAssignmentController::class)->only('show', 'store', 'update', 'destroy');
         Route::apiResource('/grades', GradeController::class)->only('show', 'store', 'update', 'destroy');
         Route::apiResource('/classrooms', ClassroomController::class)->only('show', 'store', 'update', 'destroy');

@@ -12,40 +12,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function registerMudaris(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'mudaris_id' => 'required|exists:mudaris,id',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|min:8'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()
-            ], 422);
-        }
-
-        $mudaris = Mudaris::findOrFail($request->mudaris_id);
-
-        $user = User::create([
-            'name' => $mudaris->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'mudaris',
-        ]);
-
-        $mudaris->user_id = $user->id;
-        $mudaris->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Mudaris berhasil diregistrasi',
-            'data' => $user
-        ], 201);
-    }
-
     public function showSignupForm()
     {
         return view('auth.signup');
@@ -141,7 +107,7 @@ class AuthController extends Controller
                 'message' => 'Logout Failed!',
             ], 500);
         }
-        
+
         auth()->guard('api')->logout();
         return response()->json([
             'success' => true,

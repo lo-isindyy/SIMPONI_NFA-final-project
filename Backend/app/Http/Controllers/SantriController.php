@@ -14,13 +14,6 @@ class SantriController extends Controller
     {
         $santri = Santri::whereNull('user_id')->get(['id', 'name']);
 
-        if ($santri->isEmpty()) {
-            return response()->json([
-                "success" => true,
-                "message" => "Semua santri sudah punya akun!"
-            ], 200);
-        }
-
         return response()->json([
             'success' => true,
             'data' => $santri

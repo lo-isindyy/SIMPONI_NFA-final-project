@@ -9,15 +9,6 @@ use Illuminate\Support\Facades\Validator;
 
 class MudarisController extends Controller
 {
-    public function availableMudaris()
-    {
-        $data = Mudaris::whereNull('user_id')->get(['id', 'name']);
-
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
-    }
 
     public function index()
     {
