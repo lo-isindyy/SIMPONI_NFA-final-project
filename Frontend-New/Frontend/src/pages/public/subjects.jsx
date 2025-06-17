@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Header from '../../components/header';
+import Header from "../../components/header";
 import {
   getSubject,
   showSubject,
 } from "../../../../../Frontend-New/Frontend/src/_services/subject";
-
-
 
 const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
@@ -67,7 +65,7 @@ export default function Penjadwalan() {
 
   return (
     <>
-    <Header />
+      <Header />
       <link
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
         rel="stylesheet"
@@ -140,69 +138,6 @@ export default function Penjadwalan() {
                     <small className="text-muted fw-medium">Kelas Aktif</small>
                     <h4 className="mb-0 fw-bold">{uniqueClassroom.length}</h4>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="card border-0 shadow-sm mb-5 mx-4">
-            <div className="card-body">
-              <div className="row">
-                <div className="col-md-4 mb-3">
-                  <label className="form-label fw-medium">
-                    Cari Mata Pelajaran
-                  </label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <i className="bi bi-search"></i>
-                    </span>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Cari berdasarkan mapel..."
-                      value={searchKeyword}
-                      onChange={(e) => setSearchKeyword(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-md-4 mb-3">
-                  <label className="form-label fw-medium">Kelas</label>
-                  <select
-                    className="form-select"
-                    value={filterKelas}
-                    onChange={(e) => setFilterKelas(e.target.value)}
-                  >
-                    <option value="">Semua Kelas</option>
-                    {kelasOptions.map((kelas, index) => (
-                      <option key={index} value={kelas}>
-                        {kelas}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="col-md-4 mb-3 d-flex align-items-end">
-                  <button
-                    className="btn w-100"
-                    style={{
-                      backgroundColor: isHovered ? "#89AEDC" : "#A7C7E7",
-                      color: "#000000",
-                      border: "none",
-                      transition: "background-color 0.3s",
-                    }}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                    onClick={() => {
-                      setFilterKelas("");
-                      setSearchKeyword("");
-                      setSelectedDay("Senin");
-                    }}
-                  >
-                    <i className="bi bi-arrow-clockwise me-2"></i>
-                    Reset
-                  </button>
                 </div>
               </div>
             </div>

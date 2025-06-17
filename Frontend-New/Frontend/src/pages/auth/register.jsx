@@ -16,15 +16,15 @@ export default function Register() {
   // ];
   const [santriList, setSantriList] = useState([]);
 
-  const [selectedSantriId, setSelectedSantri] = useState("");
+  const [selectedSantriId, setSelectedSantriId] = useState("");
 
   const selectedSantri = santriList.find(
-    (santri) => santri.name === selectedSantriId
+    (santri) => santri.id === parseInt(selectedSantriId)
   );
   // console.log(selectedSantri?.name);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/santri")
+    fetch("http://127.0.0.1:8000/api/santrilist")
       .then((res) => res.json())
       .then((json) => {
         if (json.success && Array.isArray(json.data)) {
@@ -35,7 +35,7 @@ export default function Register() {
 
   // console.log(SelectedSantriId);
   const [form, setForm] = useState({
-    name: "",
+    santri_id: "",
     email: "",
     password: "",
   });
@@ -70,7 +70,7 @@ export default function Register() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          name: form.name,
+          santri_id: form.santri_id,
           email: form.email,
           password: form.password,
         }),
@@ -164,8 +164,9 @@ export default function Register() {
               className="form-select"
               value={selectedSantriId}
               onChange={(e) => {
-                setSelectedSantri(e.target.value);
-                setForm({ ...form, name: e.target.value });
+                const id = e.target.value;
+                setSelectedSantriId(id);
+                setForm({ ...form, santri_id: id });
               }}
               required
               style={{ borderRadius: "8px" }}
@@ -174,7 +175,7 @@ export default function Register() {
                 Nama Santri!
               </option>
               {santriList.map((santri) => (
-                <option key={santri.id} value={santri.name}>
+                <option key={santri.id} value={santri.id}>
                   {santri.name}
                 </option>
               ))}

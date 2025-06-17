@@ -256,7 +256,10 @@ export default function Header() {
                           </Link>
                         </li>
                         <li>
-                          <Link to="/publicPembagian-kamar" className="dropdown-item">
+                          <Link
+                            to="/publicPembagian-kamar"
+                            className="dropdown-item"
+                          >
                             Pembagian Kamar
                           </Link>
                         </li>
