@@ -12,17 +12,21 @@ export default function Penjadwalan() {
   const [filterKelas, setFilterKelas] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isHovered, setIsHovered] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
+        setLoading(true);
         const data = await getSubject(); // hasilnya = data.data
         setSubjects(data);
         // console.log(data);
       } catch (error) {
         console.error("Gagal ambil data subject:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,6 +66,19 @@ export default function Penjadwalan() {
       (filterKelas === "" || s.classroom?.name === filterKelas) &&
       s.name.toLowerCase().includes(searchKeyword.toLowerCase())
   );
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="container text-center py-5">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted">Memuat data ruang kelas...</p>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
