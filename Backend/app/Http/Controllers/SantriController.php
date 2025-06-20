@@ -84,18 +84,9 @@ class SantriController extends Controller
         ], 201);
     }
 
-    public function show()
+    public function show(string $id)
     {
-        $user = auth('api')->user();
-
-        if ($user->role !== 'santri') {
-            return response()->json([
-                "success" => false,
-                "message" => "Unauthorized access, only santri can view this"
-            ], 403);
-        }
-
-        $santri = Santri::where('user_id', $user->id)->first();
+        $santri = Santri::find($id);
 
         if (!$santri) {
             return response()->json([

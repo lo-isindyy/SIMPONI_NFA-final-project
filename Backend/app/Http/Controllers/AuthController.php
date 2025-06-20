@@ -12,10 +12,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function showSignupForm()
-    {
-        return view('auth.signup');
-    }
     public function register(Request $request)
     {
         // 1. validator
@@ -57,12 +53,6 @@ class AuthController extends Controller
             'success' => false,
             'message' => 'User creation fail',
         ], 409); // conflict
-    }
-
-
-    public function showLoginForm()
-    {
-        return view('auth.login');
     }
     public function login(Request $request)
     {
