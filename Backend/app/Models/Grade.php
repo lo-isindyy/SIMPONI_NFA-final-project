@@ -16,7 +16,7 @@ class Grade extends Model
 
     public function santri()
     {
-        return $this->belongsTo(santri::class);
+        return $this->belongsTo(Santri::class);
     }
 
     public function subject()
