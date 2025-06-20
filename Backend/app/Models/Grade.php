@@ -18,7 +18,6 @@ class Grade extends Model
 
     public function santri()
     {
-        dd('INI VERSI TERBARU');
         return $this->belongsTo(Santri::class);
     }
 
