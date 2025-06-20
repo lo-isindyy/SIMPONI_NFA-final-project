@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Santri;
+use App\Models\Subject;
 
 class Grade extends Model
 {
